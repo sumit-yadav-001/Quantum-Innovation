@@ -1,73 +1,386 @@
-# React + TypeScript + Vite
+# Enterprise HRMS Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A production-grade Enterprise Human Resource Management System (HRMS) built using modern frontend engineering standards with React, TypeScript, Vite, Redux Toolkit, React Query, Tailwind CSS, and scalable modular architecture.
 
-Currently, two official plugins are available:
+This application simulates a real-world enterprise SaaS HR platform used by organizations for employee management, attendance tracking, payroll processing, leave workflows, analytics, department operations, notifications, and administrative management.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+# Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Frontend
+- React
+- TypeScript
+- Vite
+- React Router DOM
 
-## Expanding the ESLint configuration
+## Styling
+- Tailwind CSS
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## State Management
+- Redux Toolkit
+- TanStack React Query
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Forms & Validation
+- React Hook Form
+- Zod
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## API Layer
+- Axios
+- Axios Interceptors
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Charts & Analytics
+- Recharts
+
+## Table System
+- TanStack Table
+
+## Mock API System
+- MSW (Mock Service Worker)
+- Faker.js
+
+## File Handling
+- XLSX
+- PapaParse
+
+## Testing
+- Vitest
+- React Testing Library
+
+---
+
+# Core Features
+
+## Authentication & Authorization
+- Mock JWT Authentication
+- Session Persistence
+- Protected Routes
+- Role-Based Access Control (RBAC)
+- Dynamic Sidebar Navigation
+
+### Supported Roles
+- Admin
+- HR Manager
+- Team Lead
+- Employee
+
+---
+
+# Dashboard & Analytics
+- KPI Statistic Cards
+- Attendance Insights
+- Payroll Analytics
+- Leave Statistics
+- Department Overview
+- Recent Activities
+- Quick Actions
+- Responsive Charts
+
+### Chart Types
+- Bar Charts
+- Pie Charts
+- Area Charts
+- Line Charts
+
+---
+
+# Employee Management
+- Employee Listing
+- Employee Profile
+- Add / Edit / Delete Employee
+- Status Management
+- Search & Filtering
+- Pagination
+- Sorting
+- Row Actions
+- Responsive Data Tables
+
+---
+
+# Attendance Management
+- Check-In / Check-Out
+- Attendance History
+- Monthly Reports
+- Employee Attendance Analytics
+- Attendance Percentage Tracking
+
+---
+
+# Leave Management
+- Apply Leave
+- Leave Approval Workflow
+- Leave Rejection Workflow
+- Leave History
+- Leave Balance Tracking
+
+---
+
+# Payroll Management
+- Salary Breakdown
+- Payslip UI
+- Payroll Reports
+- Bonus & Deduction Tracking
+- Payroll Summary Dashboard
+
+---
+
+# Department Management
+- Create Department
+- Update Department
+- Employee Assignment
+- Department Statistics
+
+---
+
+# Notification System
+- Toast Notifications
+- Payroll Alerts
+- Leave Alerts
+- Attendance Notifications
+- Announcement System
+
+---
+
+# Document Management
+- Upload Documents
+- File Preview
+- Download Files
+- Document Categorization
+
+### Supported File Types
+- PDF
+- DOCX
+- Images
+
+---
+
+# System Settings
+- Dark / Light Theme
+- Profile Settings
+- Notification Preferences
+- Role Settings
+- Account Management
+
+---
+
+# Scalable Frontend Architecture
+
+```bash
+src/
+│
+├── api/
+├── app/
+├── assets/
+├── components/
+├── features/
+├── hooks/
+├── layouts/
+├── mocks/
+├── pages/
+├── routes/
+├── services/
+├── store/
+├── styles/
+├── types/
+├── utils/
+└── main.tsx
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+# Enterprise Frontend Engineering Highlights
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Feature-Based Modular Architecture
+- Reusable UI Component System
+- Centralized API Layer
+- Optimized Rendering Performance
+- Route-Based Code Splitting
+- Lazy Loading
+- Reusable Business Logic
+- Enterprise Dashboard Layouts
+- Responsive Design System
+- Theme Persistence
+- API Error Handling
+- Optimistic Updates
+- Scalable Form Architecture
+- Maintainable TypeScript Codebase
+
+---
+
+# Reusable UI Components
+
+- Button
+- Input
+- Select
+- Modal
+- Drawer
+- Badge
+- Tabs
+- Loader
+- Empty State
+- Error State
+- Dashboard Cards
+- Reusable Data Table
+- Pagination Components
+
+---
+
+# Table System Features
+
+Built using TanStack Table with:
+- Sorting
+- Filtering
+- Pagination
+- Export Support
+- Row Actions
+- Responsive Layouts
+
+---
+
+# Mock API Simulation
+
+Using MSW + Faker.js:
+- Simulated Authentication APIs
+- Employee APIs
+- Payroll APIs
+- Attendance APIs
+- Delayed Responses
+- Network Error Simulation
+
+---
+
+# Import & Export System
+
+- CSV Import
+- Excel Export
+- Payroll Report Export
+- Employee Report Export
+
+---
+
+# Theme System
+
+- Dark Mode
+- Light Mode
+- localStorage Theme Persistence
+
+---
+
+# Error Handling
+
+Supports:
+- API Failure Handling
+- Validation Errors
+- Unauthorized Access
+- Retry Actions
+- Empty States
+- Error Fallback UI
+
+---
+
+# Performance Optimization
+
+- Memoization
+- Debounced Search
+- Optimized Rendering
+- React Query Caching
+- Background Refetching
+- Code Splitting
+- Lazy Loading
+
+---
+
+# Testing
+
+Implemented with:
+- Vitest
+- React Testing Library
+
+Test Coverage Includes:
+- Components
+- Forms
+- Routing
+- API States
+- Table Functionality
+
+---
+
+# Installation
+
+## Clone Repository
+
+```bash
+git clone https://github.com/your-username/hrms-project.git
 ```
+
+## Navigate to Project
+
+```bash
+cd hrms-project
+```
+
+## Install Dependencies
+
+```bash
+npm install
+```
+
+## Run Development Server
+
+```bash
+npm run dev
+```
+
+---
+
+# Build for Production
+
+```bash
+npm run build
+```
+
+---
+
+# Preview Production Build
+
+```bash
+npm run preview
+```
+
+---
+
+# Deployment Ready
+
+This project is optimized for:
+- Vercel
+- Netlify
+- AWS Amplify
+
+---
+
+# Future Enhancements
+
+- Real Backend Integration
+- WebSocket Notifications
+- Multi-Tenant Support
+- AI-Based HR Analytics
+- Advanced Payroll Engine
+- Biometric Attendance Integration
+- Real-Time Collaboration
+
+---
+
+# Author
+
+## Sumit Yadav
+
+Frontend Developer | MERN Stack Developer | Java & DSA Enthusiast
+
+- LinkedIn: www.linkedin.com/in/sumit-yadav-08562422b
+- Email: sumityadav0370@gmail.com
+
+---
+
+# License
+
+This project is built for educational, portfolio, and enterprise frontend architecture demonstration purposes.
