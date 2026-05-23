@@ -3,7 +3,7 @@ import { usePayroll, usePayrollStats } from '../../hooks';
 import { Button } from '../../components/ui/Button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Download, FileSpreadsheet } from 'lucide-react';
-import { formatCurrency, formatDate } from '../../utils/helpers';
+import { formatCurrency } from '../../utils/helpers';
 
 const PayrollFeature: React.FC = () => {
   const [month, setMonth] = useState(new Date().toISOString().substring(0, 7));

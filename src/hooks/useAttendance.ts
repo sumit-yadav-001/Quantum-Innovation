@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/axios';
-import type { AttendanceRecord } from '../types';
+
 
 interface AttendanceFilters {
   date?: string;
@@ -51,7 +51,7 @@ export const useCheckIn = () => {
       time: new Date().toLocaleTimeString('en-US', { hour12: false }),
       action: 'IN',
     }),
-    onSuccess: (_, employeeId) => {
+    onSuccess: (_, _employeeId) => {
       queryClient.invalidateQueries({ queryKey: ['attendance'] });
       queryClient.invalidateQueries({ queryKey: ['attendanceStats'] });
     },

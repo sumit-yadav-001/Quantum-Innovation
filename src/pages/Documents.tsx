@@ -8,13 +8,10 @@ import {
   FileText, 
   FileSpreadsheet, 
   FileCode, 
-  Plus, 
   Search, 
   FileArchive, 
-  X, 
   Calendar, 
   Database,
-  Building,
   User
 } from 'lucide-react';
 import apiClient from '../api/axios';

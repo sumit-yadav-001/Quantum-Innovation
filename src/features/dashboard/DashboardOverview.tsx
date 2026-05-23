@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart, Bar, PieChart, Pie, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, PieChart, Pie, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Users, TrendingUp, Calendar, Briefcase, AlertCircle } from 'lucide-react';
 import { useDashboardStats, useRecentActivity } from '../../hooks';
 import { formatCurrency } from '../../utils/helpers';

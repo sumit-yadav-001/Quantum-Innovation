@@ -7,9 +7,7 @@ import {
   DollarSign, 
   UserCheck, 
   FolderEdit, 
-  AlertCircle,
-  HelpCircle,
-  Activity
+  AlertCircle
 } from 'lucide-react';
 import apiClient from '../api/axios';
 import { ENDPOINTS } from '../api/endpoints';

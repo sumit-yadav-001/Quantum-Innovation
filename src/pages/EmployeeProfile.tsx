@@ -7,13 +7,11 @@ import {
   Phone, 
   Briefcase, 
   Calendar, 
-  Wallet,
   Clock,
   CalendarDays,
   Receipt,
   Download,
-  Eye,
-  FileText
+  Eye
 } from 'lucide-react';
 import apiClient from '../api/axios';
 import { ENDPOINTS } from '../api/endpoints';

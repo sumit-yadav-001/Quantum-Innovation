@@ -4,13 +4,7 @@ import Papa from 'papaparse';
 import { 
   Clock, 
   Search, 
-  Download, 
-  Calendar,
-  CheckCircle,
-  AlertTriangle,
-  XCircle,
-  PlaneTakeoff,
-  UserCheck
+  Download
 } from 'lucide-react';
 import apiClient from '../api/axios';
 import { ENDPOINTS } from '../api/endpoints';
@@ -18,11 +12,8 @@ import { useAppSelector, useAppDispatch } from '../app/store';
 import { addToast } from '../app/store/notificationSlice';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { Select } from '../components/ui/Select';
 import { Badge } from '../components/ui/Badge';
 import { Loader } from '../components/ui/Loader';
-import { ErrorState } from '../components/ui/ErrorState';
-import { safeArray } from '../utils/helpers';
 import type { AttendanceRecord } from '../types';
 
 export const Attendance: React.FC = () => {
@@ -37,7 +28,7 @@ export const Attendance: React.FC = () => {
   const isAdminOrHR = user?.role === 'ADMIN' || user?.role === 'HR_MANAGER' || user?.role === 'TEAM_LEAD';
 
   // 1. Fetch Today's Attendance logs (For Admin/HR)
-  const { data: allAttendance = [], isLoading: allLoading, refetch } = useQuery<AttendanceRecord[]>({
+  const { data: allAttendance = [], isLoading: allLoading } = useQuery<AttendanceRecord[]>({
     queryKey: ['attendance', { date: filterDate }],
     queryFn: async () => {
       const res = await apiClient.get(ENDPOINTS.ATTENDANCE, { params: { date: filterDate } });
@@ -171,7 +162,7 @@ export const Attendance: React.FC = () => {
             <Button
               size="sm"
               variant={isPunchedIn ? 'danger' : 'primary'}
-              disabled={isPunchedOut || punchMutation.isPending}
+              disabled={!!isPunchedOut || punchMutation.isPending}
               onClick={() => punchMutation.mutate(isPunchedIn ? 'OUT' : 'IN')}
               className="text-[11px] px-2.5 py-1 font-bold"
             >

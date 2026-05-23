@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/axios';
-import type { Employee, PaginatedResponse } from '../types';
+import type { Employee } from '../types';
 
 interface EmployeeFilters {
   search?: string;

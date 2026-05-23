@@ -1,12 +1,13 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee } from '../../hooks';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { FormInput, FormSelect, FormTextArea } from '../../components/forms';
+import type { Resolver } from 'react-hook-form';
+import { FormInput, FormSelect } from '../../components/forms';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
-import { Search, Plus, Edit2, Trash2, User, Mail, Phone, Briefcase } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, User } from 'lucide-react';
 import type { Employee } from '../../types';
 import { DEPARTMENTS, DESIGNATIONS } from '../../utils/constants';
 import { formatDate } from '../../utils/helpers';
@@ -17,7 +18,7 @@ const employeeSchema = z.object({
   phone: z.string().optional(),
   department: z.string().min(1, 'Department is required'),
   designation: z.string().min(1, 'Designation is required'),
-  salary: z.coerce.number().positive('Salary must be positive'),
+  salary: z.number().positive('Salary must be positive'),
   joiningDate: z.string().min(1, 'Joining date is required'),
 });
 
@@ -48,7 +49,7 @@ const EmployeeManagement: React.FC = () => {
     reset,
     formState: { errors },
   } = useForm<EmployeeFormData>({
-    resolver: zodResolver(employeeSchema),
+    resolver: zodResolver(employeeSchema) as Resolver<EmployeeFormData>,
     defaultValues: selectedEmployee || {},
   });
 

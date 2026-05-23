@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useAttendance, useAttendanceStats, useCheckIn, useCheckOut } from '../../hooks';
 import { Button } from '../../components/ui/Button';
-import { LogIn, LogOut, Calendar, BarChart3 } from 'lucide-react';
-import { formatDate, formatTime } from '../../utils/helpers';
+import { LogIn, LogOut } from 'lucide-react';
+import { formatTime } from '../../utils/helpers';
 
 const AttendanceFeature: React.FC = () => {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
