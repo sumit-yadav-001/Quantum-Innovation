@@ -21,9 +21,9 @@ export const DashboardCard: React.FC<DashboardCardProps> = ({
   isLoading = false
 }) => {
   return (
-    <div className="glassmorphism-card p-6 flex flex-col justify-between h-36 relative overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-[2px]">
+    <div className="glassmorphism-card p-6 flex flex-col justify-between h-36 relative overflow-hidden group cursor-default">
       {/* Background Accent Grid */}
-      <div className="absolute right-0 top-0 translate-x-4 -translate-y-4 w-24 h-24 rounded-full bg-violet-500/5 dark:bg-violet-400/5 blur-2xl pointer-events-none" />
+      <div className="absolute right-0 top-0 translate-x-4 -translate-y-4 w-24 h-24 rounded-full bg-violet-500/5 dark:bg-violet-400/5 blur-2xl pointer-events-none transition-all duration-500 group-hover:scale-150 group-hover:bg-violet-500/10" />
       
       {isLoading ? (
         <div className="space-y-3 animate-pulse">
@@ -38,7 +38,7 @@ export const DashboardCard: React.FC<DashboardCardProps> = ({
               {title}
             </span>
             {icon && (
-              <span className="p-2 rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 shrink-0">
+              <span className="p-2 rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 shrink-0 transition-all duration-300 group-hover:bg-violet-100 dark:group-hover:bg-violet-900/50 group-hover:scale-110 group-hover:shadow-sm group-hover:shadow-violet-500/20">
                 {icon}
               </span>
             )}

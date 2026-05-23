@@ -21,14 +21,14 @@ export const Button: React.FC<ButtonProps> = ({
   rightIcon,
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500/20 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 cursor-pointer';
+  const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500/20 active:scale-[0.97] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 cursor-pointer';
   
   const variants = {
-    primary: 'bg-violet-600 hover:bg-violet-700 text-white shadow-sm shadow-violet-600/10 border border-violet-600',
-    secondary: 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-200/20 dark:border-slate-700/50',
-    outline: 'border border-slate-300 dark:border-slate-700 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-200',
-    danger: 'bg-red-600 hover:bg-red-700 text-white shadow-sm border border-red-600',
-    ghost: 'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+    primary: 'bg-violet-600 hover:bg-violet-500 hover:shadow-lg hover:shadow-violet-500/25 hover:-translate-y-[1px] text-white shadow-sm shadow-violet-600/10 border border-violet-600',
+    secondary: 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 hover:shadow-md hover:-translate-y-[1px] text-slate-800 dark:text-slate-100 border border-slate-200/20 dark:border-slate-700/50',
+    outline: 'border border-slate-300 dark:border-slate-700 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900 hover:border-violet-400 dark:hover:border-violet-600 hover:shadow-sm hover:-translate-y-[1px] text-slate-700 dark:text-slate-200',
+    danger: 'bg-red-600 hover:bg-red-500 hover:shadow-lg hover:shadow-red-500/25 hover:-translate-y-[1px] text-white shadow-sm border border-red-600',
+    ghost: 'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 hover:shadow-sm text-slate-700 dark:text-slate-300'
   };
 
   const sizes = {

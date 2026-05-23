@@ -70,18 +70,32 @@
 }
 
 @layer utilities {
-  /* Glassmorphism card — works in both light and dark */
+  /* ─── Glassmorphism ──────────────────────────────────────────────────────── */
   .glassmorphism {
     background: rgba(255, 255, 255, 0.72);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(226, 232, 240, 0.5);
+    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
   }
 
   html.dark .glassmorphism,
   .dark .glassmorphism {
     background: rgba(15, 23, 42, 0.72);
     border-color: rgba(30, 41, 59, 0.5);
+  }
+
+  /* Glassmorphism hover — lift + glow */
+  .glassmorphism:hover {
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.10), 0 2px 8px rgba(0,0,0,0.06);
+    border-color: rgba(139, 92, 246, 0.18);
+    transform: translateY(-1px);
+  }
+
+  html.dark .glassmorphism:hover,
+  .dark .glassmorphism:hover {
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.18), 0 2px 8px rgba(0,0,0,0.3);
+    border-color: rgba(139, 92, 246, 0.25);
   }
 
   .glassmorphism-card {
@@ -91,6 +105,7 @@
     border: 1px solid rgba(226, 232, 240, 0.5);
     border-radius: 0.75rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
   }
 
   html.dark .glassmorphism-card,
@@ -99,13 +114,148 @@
     border-color: rgba(30, 41, 59, 0.5);
   }
 
-  /* Subtle pulse animation */
+  /* Glassmorphism card hover */
+  .glassmorphism-card:hover {
+    box-shadow: 0 12px 40px rgba(139, 92, 246, 0.12), 0 4px 12px rgba(0,0,0,0.08);
+    border-color: rgba(139, 92, 246, 0.2);
+    transform: translateY(-2px);
+  }
+
+  html.dark .glassmorphism-card:hover,
+  .dark .glassmorphism-card:hover {
+    box-shadow: 0 12px 40px rgba(139, 92, 246, 0.22), 0 4px 12px rgba(0,0,0,0.35);
+    border-color: rgba(139, 92, 246, 0.3);
+  }
+
+  /* ─── Hover card — generic interactive card lift ─────────────────────────── */
+  .hover-card {
+    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+  }
+
+  .hover-card:hover {
+    box-shadow: 0 10px 36px rgba(139, 92, 246, 0.12), 0 3px 10px rgba(0,0,0,0.07);
+    transform: translateY(-2px) scale(1.005);
+    border-color: rgba(139, 92, 246, 0.2);
+  }
+
+  html.dark .hover-card:hover,
+  .dark .hover-card:hover {
+    box-shadow: 0 10px 36px rgba(139, 92, 246, 0.2), 0 3px 10px rgba(0,0,0,0.3);
+    border-color: rgba(139, 92, 246, 0.28);
+  }
+
+  /* ─── Hover lift — subtle upward float for rows/items ───────────────────── */
+  .hover-lift {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+  }
+
+  html.dark .hover-lift:hover,
+  .dark .hover-lift:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  }
+
+  /* ─── Hover glow — violet glow ring for interactive elements ────────────── */
+  .hover-glow {
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15), 0 6px 20px rgba(139, 92, 246, 0.12);
+    transform: translateY(-1px);
+  }
+
+  html.dark .hover-glow:hover,
+  .dark .hover-glow:hover {
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25), 0 6px 20px rgba(139, 92, 246, 0.2);
+  }
+
+  /* ─── Hover scale — gentle scale for image/avatar/icon containers ────────── */
+  .hover-scale {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.04);
+  }
+
+  /* ─── Nav item hover — sidebar/header nav links ─────────────────────────── */
+  .nav-item {
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .nav-item:hover {
+    transform: translateX(2px);
+  }
+
+  /* ─── Table row hover — smooth row highlight ─────────────────────────────── */
+  .table-row-hover {
+    transition: background 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .table-row-hover:hover {
+    box-shadow: inset 3px 0 0 rgba(139, 92, 246, 0.5);
+  }
+
+  /* ─── Action button hover — icon action buttons in tables ───────────────── */
+  .action-btn {
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .action-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  /* ─── Stat card hover — KPI / stat cards ────────────────────────────────── */
+  .stat-card {
+    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+  }
+
+  .stat-card:hover {
+    box-shadow: 0 8px 28px rgba(139, 92, 246, 0.13), 0 2px 8px rgba(0,0,0,0.06);
+    transform: translateY(-3px);
+    border-color: rgba(139, 92, 246, 0.22);
+  }
+
+  html.dark .stat-card:hover,
+  .dark .stat-card:hover {
+    box-shadow: 0 8px 28px rgba(139, 92, 246, 0.22), 0 2px 8px rgba(0,0,0,0.3);
+    border-color: rgba(139, 92, 246, 0.3);
+  }
+
+  /* ─── Notification item hover ────────────────────────────────────────────── */
+  .notif-item {
+    transition: background 0.2s ease, padding-left 0.2s ease;
+  }
+
+  .notif-item:hover {
+    padding-left: 1.25rem;
+  }
+
+  /* ─── Subtle pulse animation ─────────────────────────────────────────────── */
   .animate-pulse-subtle {
     animation: pulseSubtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* ─── Shimmer loading effect ─────────────────────────────────────────────── */
+  .shimmer {
+    background: linear-gradient(90deg, transparent 0%, rgba(139,92,246,0.06) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.8s infinite;
   }
 }
 
 @keyframes pulseSubtle {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
