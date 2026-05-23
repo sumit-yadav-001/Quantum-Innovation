@@ -3,26 +3,26 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 
-async function prepareApp() {
+// Boot MSW before mounting React so the first API call is already intercepted.
+// If the service worker fails (e.g. first load, incognito), the app still works
+// via the inline fallback auth in Login.tsx.
+async function startApp() {
   try {
-    const { worker } = await import('./mocks/browser');
+    const { worker } = await import('./mocks/browser')
     await worker.start({
       onUnhandledRequest: 'bypass',
-      serviceWorker: {
-        url: '/mockServiceWorker.js',
-      },
-    });
-    console.log('[MSW] ✓ Mock Service Worker active — API calls will be intercepted');
-  } catch (error) {
-    console.warn('[MSW] ✗ Service Worker failed to start:', error);
-    console.warn('[MSW] App will use fallback mock auth. Some API features may show empty data.');
+      serviceWorker: { url: '/mockServiceWorker.js' },
+    })
+    console.log('[MSW] worker running — all /api/* requests are intercepted')
+  } catch (err) {
+    console.warn('[MSW] worker failed to start, falling back to inline mock auth', err)
   }
 }
 
-prepareApp().then(() => {
+startApp().then(() => {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <App />
-    </StrictMode>,
+    </StrictMode>
   )
-});
+})

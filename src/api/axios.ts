@@ -1,63 +1,54 @@
-import axios from 'axios';
-import type { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
+import axios from 'axios'
+import type { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
 
-// Create base axios instance
 const apiClient = axios.create({
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
   },
-});
+})
 
-// Request Interceptor: Inject JWT Token
+// Attach the JWT on every outgoing request
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('hrms_token');
+    const token = localStorage.getItem('hrms_token')
     if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`
     }
-    return config;
+    return config
   },
-  (error: AxiosError) => {
-    return Promise.reject(error);
-  }
-);
+  (err: AxiosError) => Promise.reject(err)
+)
 
-// Response Interceptor: Extract Data & Normalize Errors
+// Normalize errors so every catch block gets a consistent shape
 apiClient.interceptors.response.use(
-  (response: AxiosResponse) => {
-    return response;
-  },
-  (error: AxiosError) => {
-    let errorMessage = 'An unexpected network error occurred.';
+  (res: AxiosResponse) => res,
+  (err: AxiosError) => {
+    let message = 'Something went wrong. Please try again.'
 
-    if (error.response) {
-      // Server responded with non-2xx code
-      const responseData = error.response.data as any;
-      errorMessage = responseData?.message || errorMessage;
+    if (err.response) {
+      const data = err.response.data as any
+      message = data?.message || message
 
-      // Auto-handle 401 Unauthorized — clear tokens but don't redirect here
-      // (redirect is handled by RequireAuth component via Redux state)
-      if (error.response.status === 401) {
-        localStorage.removeItem('hrms_token');
-        localStorage.removeItem('hrms_user');
+      // 401 means the token is gone — clear storage.
+      // The redirect itself is handled by RequireAuth watching Redux state.
+      if (err.response.status === 401) {
+        localStorage.removeItem('hrms_token')
+        localStorage.removeItem('hrms_user')
       }
-    } else if (error.request) {
-      // Request made but no response — MSW not running or network issue
-      errorMessage = 'Service unavailable. Mock API may not be active.';
+    } else if (err.request) {
+      message = 'No response from server — MSW may not be running.'
     } else {
-      errorMessage = error.message;
+      message = err.message
     }
 
-    const normalizedError = {
-      message: errorMessage,
-      status: (error.response?.status) ?? 0,
-      originalError: error,
-    };
-
-    return Promise.reject(normalizedError);
+    return Promise.reject({
+      message,
+      status: err.response?.status ?? 0,
+      originalError: err,
+    })
   }
-);
+)
 
-export default apiClient;
+export default apiClient

@@ -1,17 +1,17 @@
-import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
-import Login from '../../pages/Login';
-import Dashboard from '../../pages/Dashboard';
-import Employees from '../../pages/Employees';
-import EmployeeProfile from '../../pages/EmployeeProfile';
-import Attendance from '../../pages/Attendance';
-import Leaves from '../../pages/Leaves';
-import Payroll from '../../pages/Payroll';
-import Departments from '../../pages/Departments';
-import Documents from '../../pages/Documents';
-import Settings from '../../pages/Settings';
-import MainLayout from '../../components/layouts/MainLayout';
-import { RequireAuth } from './RequireAuth';
-import { RoleGuard } from './RoleGuard';
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
+import Login from '../../pages/Login'
+import Dashboard from '../../pages/Dashboard'
+import Employees from '../../pages/Employees'
+import EmployeeProfile from '../../pages/EmployeeProfile'
+import Attendance from '../../pages/Attendance'
+import Leaves from '../../pages/Leaves'
+import Payroll from '../../pages/Payroll'
+import Departments from '../../pages/Departments'
+import Documents from '../../pages/Documents'
+import Settings from '../../pages/Settings'
+import MainLayout from '../../components/layouts/MainLayout'
+import { RequireAuth } from './RequireAuth'
+import { RoleGuard } from './RoleGuard'
 
 const router = createBrowserRouter([
   {
@@ -19,6 +19,8 @@ const router = createBrowserRouter([
     element: <Login />,
   },
   {
+    // Everything under "/" is behind auth. MainLayout renders the shell
+    // (sidebar + header) and <Outlet /> drops in the active page.
     path: '/',
     element: (
       <RequireAuth>
@@ -50,10 +52,10 @@ const router = createBrowserRouter([
       },
       { path: 'documents', element: <Documents /> },
       { path: 'settings', element: <Settings /> },
-      { path: '*', element: <Navigate to="/dashboard" replace /> }
+      { path: '*', element: <Navigate to="/dashboard" replace /> },
     ],
   },
-]);
+])
 
-export const AppRouter = () => <RouterProvider router={router} />;
-export default AppRouter;
+export const AppRouter = () => <RouterProvider router={router} />
+export default AppRouter
