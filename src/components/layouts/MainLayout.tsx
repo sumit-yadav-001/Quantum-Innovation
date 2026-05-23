@@ -115,7 +115,7 @@ export const MainLayout: React.FC = () => {
           {sidebarOpen && (
             <button 
               onClick={() => dispatch(toggleSidebar())}
-              className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 transition-colors"
+              className="p-1 rounded-lg hover:bg-violet-500/10 dark:hover:bg-violet-500/15 text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -133,7 +133,7 @@ export const MainLayout: React.FC = () => {
                 className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative ${
                   isActive
                     ? 'bg-violet-600 text-white shadow-sm shadow-violet-600/20'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-850 hover:text-slate-900 dark:hover:text-slate-200 hover:translate-x-0.5 hover:shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-violet-500/10 dark:hover:bg-violet-500/15 hover:text-violet-700 dark:hover:text-violet-300 hover:translate-x-0.5 hover:shadow-sm'
                 }`}
               >
                 <span className={`${isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-350'}`}>
@@ -155,7 +155,7 @@ export const MainLayout: React.FC = () => {
           <div className="p-4 border-t border-slate-250 dark:border-slate-800 flex justify-center">
             <button 
               onClick={() => dispatch(toggleSidebar())}
-              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 transition-colors"
+              className="p-2 rounded-lg hover:bg-violet-500/10 dark:hover:bg-violet-500/15 text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
             >
               <ChevronLeft className="w-5 h-5 rotate-180" />
             </button>
@@ -177,7 +177,7 @@ export const MainLayout: React.FC = () => {
               </div>
               <button 
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-850 rounded"
+              className="p-1 text-slate-400 hover:bg-violet-500/10 dark:hover:bg-violet-500/15 hover:text-violet-600 dark:hover:text-violet-400 rounded transition-colors"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
@@ -193,7 +193,7 @@ export const MainLayout: React.FC = () => {
                     className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                       isActive
                         ? 'bg-violet-600 text-white'
-                        : 'text-slate-600 dark:text-slate-450 hover:bg-slate-100 dark:hover:bg-slate-850'
+                        : 'text-slate-600 dark:text-slate-450 hover:bg-violet-500/10 dark:hover:bg-violet-500/15 hover:text-violet-700 dark:hover:text-violet-300'
                     }`}
                   >
                     {item.icon}
@@ -222,7 +222,7 @@ export const MainLayout: React.FC = () => {
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setMobileMenuOpen(true)}
-              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 md:hidden"
+              className="p-1.5 rounded-lg hover:bg-violet-500/10 dark:hover:bg-violet-500/15 hover:text-violet-600 dark:hover:text-violet-400 md:hidden transition-colors"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -235,7 +235,7 @@ export const MainLayout: React.FC = () => {
             {/* Dark Mode toggle */}
             <button
               onClick={() => dispatch(toggleTheme())}
-              className="p-2 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-850 transition-all cursor-pointer"
+              className="p-2 rounded-lg text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-500/10 dark:hover:bg-violet-500/15 transition-all cursor-pointer"
             >
               {theme === 'dark' ? <Sun className="w-4.5 h-4.5" /> : <Moon className="w-4.5 h-4.5" />}
             </button>
@@ -244,7 +244,7 @@ export const MainLayout: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setNotifPanelOpen(!notifPanelOpen)}
-                className="p-2 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-850 transition-all relative cursor-pointer"
+                className="p-2 rounded-lg text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-500/10 dark:hover:bg-violet-500/15 transition-all relative cursor-pointer"
               >
                 <Bell className="w-4.5 h-4.5" />
                 {unreadCount > 0 && (
@@ -276,7 +276,7 @@ export const MainLayout: React.FC = () => {
                               if (!notif.read) markReadMutation.mutate(notif.id);
                               setNotifPanelOpen(false);
                             }}
-                            className={`px-4 py-3 border-b border-slate-50 dark:border-slate-850/50 hover:bg-slate-50 dark:hover:bg-slate-850/50 cursor-pointer flex flex-col gap-0.5 text-left transition-colors ${
+                            className={`px-4 py-3 border-b border-slate-800/30 hover:bg-violet-500/8 dark:hover:bg-violet-500/10 cursor-pointer flex flex-col gap-0.5 text-left transition-colors ${
                               !notif.read ? 'bg-violet-500/5 dark:bg-violet-400/5' : ''
                             }`}
                           >
