@@ -13,16 +13,13 @@ import {
   BarChart3,
   CalendarCheck,
   Wallet,
-  ArrowRight,
-  Building2
+  ArrowRight
 } from 'lucide-react';
 import apiClient from '../api/axios';
 import { ENDPOINTS } from '../api/endpoints';
 import { useAppDispatch, useAppSelector } from '../app/store';
 import { loginStart, loginSuccess, loginFailure } from '../app/store/authSlice';
 import { addToast } from '../app/store/notificationSlice';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),

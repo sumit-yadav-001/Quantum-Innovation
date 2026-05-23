@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import type { Resolver } from 'react-hook-form';
+import type { Resolver, SubmitHandler } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import { 
   Search, 
@@ -90,7 +90,7 @@ export const Employees: React.FC = () => {
 
   // Form Setup
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<EmployeeFormValues>({
-    resolver: zodResolver(employeeSchema),
+    resolver: zodResolver(employeeSchema) as Resolver<EmployeeFormValues>,
     defaultValues: {
       name: '',
       email: '',
@@ -640,7 +640,7 @@ export const Employees: React.FC = () => {
         onClose={() => setDrawerOpen(false)}
         title={editingEmployee ? `Modify Profile: ${editingEmployee.name}` : "Create New Employee Profile"}
       >
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit as SubmitHandler<EmployeeFormValues>)} className="space-y-4">
           <Input
             label="Full Name"
             placeholder="John Doe"

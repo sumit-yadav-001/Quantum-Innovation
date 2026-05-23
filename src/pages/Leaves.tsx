@@ -4,12 +4,7 @@ import {
   CalendarDays, 
   Plus, 
   Check, 
-  X, 
-  HelpCircle,
-  Clock,
-  ThumbsUp,
-  ThumbsDown,
-  FileText
+  X
 } from 'lucide-react';
 import apiClient from '../api/axios';
 import { ENDPOINTS } from '../api/endpoints';
@@ -20,9 +15,7 @@ import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
 import { Badge } from '../components/ui/Badge';
 import { Loader } from '../components/ui/Loader';
-import { ErrorState } from '../components/ui/ErrorState';
 import { Modal } from '../components/ui/Modal';
-import { Drawer } from '../components/ui/Drawer';
 import { safeArray } from '../utils/helpers';
 import type { LeaveRequest, LeaveBalance } from '../types';
 
