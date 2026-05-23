@@ -37,7 +37,7 @@ export const generateMockDepartments = (employees: Employee[]): Department[] => 
       managerId: deptEmployees[0]?.id || null,
       managerName: deptEmployees[0]?.name || null,
       employeeCount: deptEmployees.length,
-      budget: faker.number.int({ min: 1000000, max: 10000000, precision: 100000 }),
+      budget: Math.round(faker.number.int({ min: 10, max: 100 }) * 100000),
       description: faker.lorem.sentence(),
     };
   });

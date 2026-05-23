@@ -316,7 +316,7 @@ export const Payroll: React.FC = () => {
                       }}
                       labelStyle={{ fontWeight: 'bold' }}
                     />
-                    <Legend wrapperStyle={{ fontSize: '11px', pt: 10 }} />
+                    <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
                     <Bar dataKey="Total Spend ($)" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
