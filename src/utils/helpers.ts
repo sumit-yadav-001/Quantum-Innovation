@@ -166,3 +166,16 @@ export const calculatePercentage = (part: number, total: number): number => {
   if (total === 0) return 0;
   return Math.round((part / total) * 100);
 };
+
+/**
+ * Safely extract an array from an API response.
+ * MSW returns arrays directly; some endpoints return { data: [...] }.
+ * This prevents .filter/.map crashes when response shape is unexpected.
+ */
+export function safeArray<T>(value: unknown): T[] {
+  if (Array.isArray(value)) return value as T[];
+  if (value && typeof value === 'object' && Array.isArray((value as any).data)) {
+    return (value as any).data as T[];
+  }
+  return [];
+}

@@ -23,6 +23,7 @@ import { Loader } from '../components/ui/Loader';
 import { ErrorState } from '../components/ui/ErrorState';
 import { Modal } from '../components/ui/Modal';
 import { Drawer } from '../components/ui/Drawer';
+import { safeArray } from '../utils/helpers';
 import type { LeaveRequest, LeaveBalance } from '../types';
 
 export const Leaves: React.FC = () => {
@@ -50,7 +51,7 @@ export const Leaves: React.FC = () => {
     queryKey: ['leaves'],
     queryFn: async () => {
       const res = await apiClient.get(ENDPOINTS.LEAVES);
-      return res.data;
+      return safeArray<LeaveRequest>(res.data);
     }
   });
 
@@ -59,7 +60,7 @@ export const Leaves: React.FC = () => {
     queryKey: ['leaves', { employeeId: user?.id }],
     queryFn: async () => {
       const res = await apiClient.get(ENDPOINTS.LEAVES, { params: { employeeId: user?.id } });
-      return res.data;
+      return safeArray<LeaveRequest>(res.data);
     },
     enabled: !!user?.id
   });
@@ -162,8 +163,12 @@ export const Leaves: React.FC = () => {
     return <Loader message="Accessing leave balances and registry..." />;
   }
 
+  // Safe array guards — prevent .filter crash if MSW returns unexpected shape
+  const safeAllLeaves = Array.isArray(allLeaves) ? allLeaves : [];
+  const safeMyLeaves = Array.isArray(myLeaves) ? myLeaves : [];
+
   // Calculate leaves pending in approval queue
-  const pendingApprovals = allLeaves.filter(l => l.status === 'PENDING');
+  const pendingApprovals = safeAllLeaves.filter(l => l.status === 'PENDING');
 
   return (
     <div className="space-y-6">
@@ -231,7 +236,7 @@ export const Leaves: React.FC = () => {
                 : 'border-transparent text-slate-400 hover:text-slate-700'
             }`}
           >
-            My Requests ({myLeaves.length})
+            My Requests ({safeMyLeaves.length})
           </button>
           <button
             onClick={() => setActiveQueueTab('approvals')}
@@ -253,7 +258,7 @@ export const Leaves: React.FC = () => {
           <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">My Personal Leave History</span>
           </div>
-          {myLeaves.length === 0 ? (
+          {safeMyLeaves.length === 0 ? (
             <div className="p-8 text-center text-slate-400">You haven't submitted any leave requests yet.</div>
           ) : (
             <div className="overflow-x-auto">
@@ -268,7 +273,7 @@ export const Leaves: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200/50 dark:divide-slate-800/50">
-                  {myLeaves.map((l) => (
+                  {safeMyLeaves.map((l) => (
                     <tr key={l.id} className="hover:bg-slate-50/30 dark:hover:bg-slate-850/30">
                       <td className="px-6 py-4 font-semibold text-slate-700 dark:text-slate-350">{l.type}</td>
                       <td className="px-6 py-4">{l.startDate}</td>

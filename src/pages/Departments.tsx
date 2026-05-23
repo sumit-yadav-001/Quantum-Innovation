@@ -51,7 +51,8 @@ export const Departments: React.FC = () => {
     queryKey: ['departments'],
     queryFn: async () => {
       const res = await apiClient.get(ENDPOINTS.DEPARTMENTS);
-      return res.data;
+      const raw = res.data;
+      return Array.isArray(raw) ? raw : (raw?.data ?? []);
     }
   });
 

@@ -4,11 +4,19 @@ import './index.css'
 import App from './App.tsx'
 
 async function prepareApp() {
-  // Always boot Mock Service Worker for mock database intercepts
-  const { worker } = await import('./mocks/browser');
-  return worker.start({
-    onUnhandledRequest: 'bypass',
-  });
+  try {
+    const { worker } = await import('./mocks/browser');
+    await worker.start({
+      onUnhandledRequest: 'bypass',
+      serviceWorker: {
+        url: '/mockServiceWorker.js',
+      },
+    });
+    console.log('[MSW] ✓ Mock Service Worker active — API calls will be intercepted');
+  } catch (error) {
+    console.warn('[MSW] ✗ Service Worker failed to start:', error);
+    console.warn('[MSW] App will use fallback mock auth. Some API features may show empty data.');
+  }
 }
 
 prepareApp().then(() => {

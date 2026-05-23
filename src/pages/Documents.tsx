@@ -58,7 +58,8 @@ export const Documents: React.FC = () => {
     queryKey: ['documents'],
     queryFn: async () => {
       const res = await apiClient.get(ENDPOINTS.DOCUMENTS);
-      return res.data;
+      const raw = res.data;
+      return Array.isArray(raw) ? raw : (raw?.data ?? []);
     }
   });
 

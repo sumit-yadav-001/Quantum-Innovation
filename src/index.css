@@ -5,7 +5,7 @@
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-display: 'Outfit', var(--font-sans);
-  
+
   --color-primary-50: #f5f3ff;
   --color-primary-100: #ede9fe;
   --color-primary-200: #ddd6fe;
@@ -19,45 +19,93 @@
   --color-primary-950: #2e1065;
 }
 
+/* ─── Dark mode variant — Tailwind v4 reads .dark on <html> ─────────────── */
+@variant dark (&:where(.dark, .dark *));
+
 @layer base {
-  html, body {
-    @apply h-full bg-slate-50 text-slate-800 antialiased selection:bg-violet-200 selection:text-violet-900 transition-colors duration-200;
+  *, *::before, *::after {
+    box-sizing: border-box;
   }
-  
+
+  html {
+    height: 100%;
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply h-full bg-slate-50 text-slate-800 antialiased;
+    @apply selection:bg-violet-200 selection:text-violet-900;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  /* Dark mode body */
+  html.dark body,
   body.dark {
     @apply bg-slate-950 text-slate-100;
   }
 
   /* Custom scrollbar */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-transparent;
+    background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate-300 dark:bg-slate-700 rounded-full hover:bg-slate-400 dark:hover:bg-slate-600;
+    @apply bg-slate-300 rounded-full;
+  }
+  html.dark ::-webkit-scrollbar-thumb,
+  .dark ::-webkit-scrollbar-thumb {
+    @apply bg-slate-700;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400;
+  }
+  html.dark ::-webkit-scrollbar-thumb:hover,
+  .dark ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-600;
   }
 }
 
 @layer utilities {
+  /* Glassmorphism card — works in both light and dark */
   .glassmorphism {
-    @apply backdrop-blur-md bg-white/70 dark:bg-slate-900/70 border border-slate-200/50 dark:border-slate-800/50;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(226, 232, 240, 0.5);
   }
+
+  html.dark .glassmorphism,
+  .dark .glassmorphism {
+    background: rgba(15, 23, 42, 0.72);
+    border-color: rgba(30, 41, 59, 0.5);
+  }
+
   .glassmorphism-card {
-    @apply backdrop-blur-md bg-white/85 dark:bg-slate-900/85 border border-slate-200/50 dark:border-slate-800/50 shadow-sm rounded-xl;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(226, 232, 240, 0.5);
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
   }
+
+  html.dark .glassmorphism-card,
+  .dark .glassmorphism-card {
+    background: rgba(15, 23, 42, 0.88);
+    border-color: rgba(30, 41, 59, 0.5);
+  }
+
+  /* Subtle pulse animation */
   .animate-pulse-subtle {
     animation: pulseSubtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 }
 
 @keyframes pulseSubtle {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: .7;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }

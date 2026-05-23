@@ -3,7 +3,7 @@ import type { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axio
 
 // Create base axios instance
 const apiClient = axios.create({
-  timeout: 10000,
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -30,30 +30,29 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error: AxiosError) => {
-    // Normalize error details
     let errorMessage = 'An unexpected network error occurred.';
-    
+
     if (error.response) {
       // Server responded with non-2xx code
       const responseData = error.response.data as any;
       errorMessage = responseData?.message || errorMessage;
-      
-      // Auto-handle 401 Unauthorized (e.g., clear tokens and trigger reload or handle in hook)
+
+      // Auto-handle 401 Unauthorized — clear tokens but don't redirect here
+      // (redirect is handled by RequireAuth component via Redux state)
       if (error.response.status === 401) {
         localStorage.removeItem('hrms_token');
         localStorage.removeItem('hrms_user');
       }
     } else if (error.request) {
-      // Request made but no response received
-      errorMessage = 'No response received from the server. Please check your network connection.';
+      // Request made but no response — MSW not running or network issue
+      errorMessage = 'Service unavailable. Mock API may not be active.';
     } else {
-      // Error in setting up request
       errorMessage = error.message;
     }
 
     const normalizedError = {
       message: errorMessage,
-      status: error.response?.status,
+      status: (error.response?.status) ?? 0,
       originalError: error,
     };
 

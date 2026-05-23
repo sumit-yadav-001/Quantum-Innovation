@@ -49,7 +49,8 @@ export const Payroll: React.FC = () => {
           department: selectedDept === 'All' ? '' : selectedDept
         }
       });
-      return res.data;
+      const raw = res.data;
+      return Array.isArray(raw) ? raw : (raw?.data ?? []);
     }
   });
 
@@ -155,7 +156,7 @@ export const Payroll: React.FC = () => {
 
   const handleDownloadPayslipCSV = (record: PayrollRecord) => {
     const csvContent = [
-      ['AuraHR Corporation - Salary Statement'],
+      ['Quantum Innovations - Salary Statement'],
       ['Payslip Period', record.month],
       ['Employee Name', record.employeeName],
       ['Employee ID', record.employeeId],
@@ -456,7 +457,7 @@ export const Payroll: React.FC = () => {
                 const blob = new Blob([csvStr], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.setAttribute('download', `AuraHR_Payroll_${selectedMonth}.csv`);
+                link.setAttribute('download', `QuantumInnovations_Payroll_${selectedMonth}.csv`);
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);

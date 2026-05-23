@@ -46,7 +46,8 @@ export const MainLayout: React.FC = () => {
     queryKey: ['notifications'],
     queryFn: async () => {
       const res = await apiClient.get('/api/notifications');
-      return res.data;
+      const raw = res.data;
+      return Array.isArray(raw) ? raw : (raw?.data ?? []);
     },
     refetchInterval: 15000 // poll every 15s to simulate real-time
   });
@@ -89,7 +90,7 @@ export const MainLayout: React.FC = () => {
   const filteredNavItems = navItems.filter(item => user && item.roles.includes(user.role));
 
   return (
-    <div className={`min-h-screen flex ${theme === 'dark' ? 'dark' : ''} bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans`}>
+    <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans">
       {/* Toast container floater */}
       <ToastContainer />
 
@@ -107,7 +108,7 @@ export const MainLayout: React.FC = () => {
             </div>
             {sidebarOpen && (
               <span className="font-bold font-display text-lg tracking-tight bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
-                AuraHR
+                Quantum Innovations
               </span>
             )}
           </div>
@@ -172,7 +173,7 @@ export const MainLayout: React.FC = () => {
                 <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center">
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
-                <span className="font-bold text-lg text-slate-850 dark:text-white">AuraHR</span>
+                <span className="font-bold text-lg text-slate-850 dark:text-white">Quantum Innovations</span>
               </div>
               <button 
                 onClick={() => setMobileMenuOpen(false)}

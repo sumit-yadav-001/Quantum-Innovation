@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Settings as SettingsIcon, 
@@ -7,21 +7,19 @@ import {
   Sun, 
   Moon, 
   ShieldAlert, 
-  Lock, 
   Save, 
-  Globe, 
-  Volume2,
-  Database
+  Database,
+  Camera,
+  Trash2
 } from 'lucide-react';
 import apiClient from '../api/axios';
 import { ENDPOINTS } from '../api/endpoints';
 import { useAppSelector, useAppDispatch } from '../app/store';
-import { toggleTheme } from '../app/store/uiSlice';
+import { setTheme } from '../app/store/uiSlice';
 import { loginSuccess } from '../app/store/authSlice';
 import { addToast } from '../app/store/notificationSlice';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { Badge } from '../components/ui/Badge';
 import { resetDB } from '../mocks/db';
 
 export const Settings: React.FC = () => {
@@ -36,8 +34,62 @@ export const Settings: React.FC = () => {
   // Form States - Profile
   const [profileName, setProfileName] = useState(user?.name || '');
   const [profileEmail, setProfileEmail] = useState(user?.email || '');
-  const [profilePhone, setProfilePhone] = useState('+1 (555) 019-9000'); // default fallback
+  const [profilePhone, setProfilePhone] = useState('+1 (555) 019-9000');
   const [profileAvatar, setProfileAvatar] = useState(user?.avatar || '');
+  const [avatarError, setAvatarError] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync form with user state changes (e.g. after login)
+  useEffect(() => {
+    if (user) {
+      setProfileName(user.name || '');
+      setProfileEmail(user.email || '');
+      setProfileAvatar(user.avatar || '');
+      setAvatarError(false);
+    }
+  }, [user?.id]);
+
+  // Handle local file selection → convert to base64 data URL
+  const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      dispatch(addToast({ title: 'Invalid File', message: 'Please select an image file (JPG, PNG, WebP).', type: 'error' }));
+      return;
+    }
+
+    // Validate file size — max 2MB
+    if (file.size > 2 * 1024 * 1024) {
+      dispatch(addToast({ title: 'File Too Large', message: 'Image must be under 2MB.', type: 'error' }));
+      return;
+    }
+
+    setAvatarUploading(true);
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUrl = ev.target?.result as string;
+      setProfileAvatar(dataUrl);
+      setAvatarError(false);
+      setAvatarUploading(false);
+      dispatch(addToast({ title: 'Photo Selected', message: 'Click "Save Profile Changes" to apply.', type: 'info' }));
+    };
+    reader.onerror = () => {
+      setAvatarUploading(false);
+      dispatch(addToast({ title: 'Read Error', message: 'Could not read the selected file.', type: 'error' }));
+    };
+    reader.readAsDataURL(file);
+
+    // Reset input so same file can be re-selected
+    e.target.value = '';
+  };
+
+  const handleRemoveAvatar = () => {
+    setProfileAvatar('');
+    setAvatarError(false);
+  };
 
   // Form States - Preferences
   const [prefEmailNotifs, setPrefEmailNotifs] = useState(true);
@@ -83,16 +135,17 @@ export const Settings: React.FC = () => {
       return res.data;
     },
     onSuccess: (updatedEmp) => {
-      // Sync auth store
+      // Sync auth store with updated profile
       if (user && token) {
         const updatedUserObj = {
           ...user,
           name: updatedEmp.name,
           email: updatedEmp.email,
-          avatar: updatedEmp.avatar
+          avatar: updatedEmp.avatar || user.avatar
         };
         dispatch(loginSuccess({ user: updatedUserObj, token }));
       }
+      setAvatarError(false);
       queryClient.invalidateQueries({ queryKey: ['employees'] });
       
       dispatch(addToast({
@@ -217,20 +270,81 @@ export const Settings: React.FC = () => {
               </h2>
               
               <form onSubmit={handleProfileSubmit} className="space-y-4">
-                <div className="flex flex-col sm:flex-row gap-6 items-center border-b border-slate-100 dark:border-slate-850 pb-5">
-                  <img 
-                    src={profileAvatar} 
-                    alt={user?.name} 
-                    className="w-20 h-20 rounded-full object-cover border-2 border-violet-100 dark:border-slate-800"
+                {/* Avatar Upload Section */}
+                <div className="flex flex-col sm:flex-row gap-6 items-center border-b border-slate-100 dark:border-slate-800 pb-6">
+                  {/* Hidden file input */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    onChange={handleAvatarFileChange}
+                    className="hidden"
                   />
-                  <div className="space-y-2 w-full text-center sm:text-left">
-                    <Input
-                      label="Profile Photo URL"
-                      value={profileAvatar}
-                      onChange={(e) => setProfileAvatar(e.target.value)}
-                      placeholder="Avatar Image Link"
-                    />
-                    <p className="text-[10px] text-slate-400 font-medium">Use a public Unsplash/image link to update avatar instantly.</p>
+
+                  {/* Clickable Avatar */}
+                  <div className="relative group shrink-0 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                    {/* Avatar image or initials fallback */}
+                    {profileAvatar && !avatarError ? (
+                      <img
+                        src={profileAvatar}
+                        alt={profileName || 'Profile'}
+                        onError={() => setAvatarError(true)}
+                        onLoad={() => setAvatarError(false)}
+                        className="w-24 h-24 rounded-full object-cover border-2 border-violet-200 dark:border-violet-800 shadow-lg"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center border-2 border-violet-200 dark:border-violet-800 shadow-lg">
+                        <span className="text-3xl font-bold text-white select-none">
+                          {(profileName || user?.name || 'U').charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1">
+                      {avatarUploading ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          <Camera className="w-5 h-5 text-white" />
+                          <span className="text-[9px] text-white font-semibold tracking-wide">CHANGE</span>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Online dot */}
+                    <span className="absolute bottom-1 right-1 w-4 h-4 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full" />
+                  </div>
+
+                  {/* Info + actions */}
+                  <div className="flex flex-col gap-2 text-center sm:text-left">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{profileName || user?.name}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">{user?.designation} · {user?.department}</p>
+                    </div>
+                    <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-colors cursor-pointer"
+                      >
+                        <Camera className="w-3.5 h-3.5" />
+                        Upload Photo
+                      </button>
+                      {profileAvatar && (
+                        <button
+                          type="button"
+                          onClick={handleRemoveAvatar}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-red-50 hover:text-red-600 hover:border-red-200 dark:hover:bg-red-950/20 dark:hover:text-red-400 rounded-lg transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-slate-400 leading-relaxed">
+                      JPG, PNG or WebP · Max 2MB · Click photo or button to upload
+                    </p>
                   </div>
                 </div>
 
@@ -420,7 +534,7 @@ export const Settings: React.FC = () => {
               <SettingsIcon className="w-5.5 h-5.5" />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-slate-805 dark:text-white">AuraHR Theme Selection</h3>
+              <h3 className="font-bold text-sm text-slate-805 dark:text-white">Quantum Innovations Theme Selection</h3>
               <p className="text-[10px] text-slate-400 font-medium">Synchronized theme controller</p>
             </div>
           </div>
@@ -434,23 +548,23 @@ export const Settings: React.FC = () => {
           {/* Theme button */}
           <div className="flex gap-2">
             <button
-              onClick={() => { if (theme !== 'light') dispatch(toggleTheme()); }}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 border rounded-lg text-xs font-semibold cursor-pointer transition-all ${
+              onClick={() => dispatch(setTheme('light'))}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 border rounded-lg text-xs font-semibold cursor-pointer transition-all ${
                 theme === 'light'
-                  ? 'bg-violet-600 text-white border-violet-600 shadow-sm'
-                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-650 hover:bg-slate-50'
+                  ? 'bg-violet-600 text-white border-violet-600 shadow-sm shadow-violet-500/20'
+                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
               <Sun className="w-4 h-4" />
               <span>Light Mode</span>
             </button>
-            
+
             <button
-              onClick={() => { if (theme !== 'dark') dispatch(toggleTheme()); }}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 border rounded-lg text-xs font-semibold cursor-pointer transition-all ${
+              onClick={() => dispatch(setTheme('dark'))}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 border rounded-lg text-xs font-semibold cursor-pointer transition-all ${
                 theme === 'dark'
-                  ? 'bg-violet-600 text-white border-violet-600 shadow-sm'
-                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-650 hover:bg-slate-50'
+                  ? 'bg-violet-600 text-white border-violet-600 shadow-sm shadow-violet-500/20'
+                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
               <Moon className="w-4 h-4" />

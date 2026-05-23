@@ -48,7 +48,8 @@ export const EmployeeProfile: React.FC = () => {
     queryKey: ['attendance', { employeeId: id }],
     queryFn: async () => {
       const res = await apiClient.get(ENDPOINTS.ATTENDANCE, { params: { employeeId: id } });
-      return res.data;
+      const raw = res.data;
+      return Array.isArray(raw) ? raw : (raw?.data ?? []);
     },
     enabled: !!id
   });
@@ -58,7 +59,8 @@ export const EmployeeProfile: React.FC = () => {
     queryKey: ['leaves', { employeeId: id }],
     queryFn: async () => {
       const res = await apiClient.get(ENDPOINTS.LEAVES, { params: { employeeId: id } });
-      return res.data;
+      const raw = res.data;
+      return Array.isArray(raw) ? raw : (raw?.data ?? []);
     },
     enabled: !!id
   });
@@ -68,7 +70,8 @@ export const EmployeeProfile: React.FC = () => {
     queryKey: ['payroll'],
     queryFn: async () => {
       const res = await apiClient.get(ENDPOINTS.PAYROLL);
-      return res.data;
+      const raw = res.data;
+      return Array.isArray(raw) ? raw : (raw?.data ?? []);
     }
   });
 

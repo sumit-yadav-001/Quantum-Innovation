@@ -20,9 +20,9 @@ import {
 import { 
   useReactTable, 
   getCoreRowModel, 
-  ColumnDef, 
   flexRender 
 } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 import apiClient from '../api/axios';

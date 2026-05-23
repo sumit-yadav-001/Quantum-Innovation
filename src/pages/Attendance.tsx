@@ -22,6 +22,7 @@ import { Select } from '../components/ui/Select';
 import { Badge } from '../components/ui/Badge';
 import { Loader } from '../components/ui/Loader';
 import { ErrorState } from '../components/ui/ErrorState';
+import { safeArray } from '../utils/helpers';
 import type { AttendanceRecord } from '../types';
 
 export const Attendance: React.FC = () => {
@@ -40,7 +41,9 @@ export const Attendance: React.FC = () => {
     queryKey: ['attendance', { date: filterDate }],
     queryFn: async () => {
       const res = await apiClient.get(ENDPOINTS.ATTENDANCE, { params: { date: filterDate } });
-      return res.data;
+      // MSW returns array directly — handle both array and wrapped object
+      const raw = res.data;
+      return Array.isArray(raw) ? raw : (raw?.data ?? []);
     },
     enabled: isAdminOrHR
   });
@@ -50,7 +53,8 @@ export const Attendance: React.FC = () => {
     queryKey: ['attendance', { employeeId: user?.id }],
     queryFn: async () => {
       const res = await apiClient.get(ENDPOINTS.ATTENDANCE, { params: { employeeId: user?.id } });
-      return res.data;
+      const raw = res.data;
+      return Array.isArray(raw) ? raw : (raw?.data ?? []);
     },
     enabled: !!user?.id
   });
@@ -95,13 +99,16 @@ export const Attendance: React.FC = () => {
 
   const stats = attStatsRes || { presentPercentage: 0, totalPresents: 0, totalLates: 0, totalLeaves: 0, totalAbsents: 0 };
 
-  // Filter attendance log by search query
-  const filteredAttendance = allAttendance.filter((rec) => 
-    rec.employeeName.toLowerCase().includes(employeeSearch.toLowerCase())
+  // Filter attendance log by search query — safe array check
+  const safeAllAttendance = Array.isArray(allAttendance) ? allAttendance : [];
+  const safeMyAttendance = Array.isArray(myAttendance) ? myAttendance : [];
+
+  const filteredAttendance = safeAllAttendance.filter((rec) =>
+    rec.employeeName?.toLowerCase().includes(employeeSearch.toLowerCase())
   );
 
   // Check today's punch state for the logged in user
-  const personalTodayRecord = myAttendance.find((rec) => rec.date === todayStr);
+  const personalTodayRecord = safeMyAttendance.find((rec) => rec.date === todayStr);
   const isPunchedIn = personalTodayRecord && personalTodayRecord.checkIn && !personalTodayRecord.checkOut;
   const isPunchedOut = personalTodayRecord && personalTodayRecord.checkIn && personalTodayRecord.checkOut;
 
@@ -123,7 +130,7 @@ export const Attendance: React.FC = () => {
 
   const handleExportCSV = () => {
     dispatch(addToast({ title: 'Exporting Logs', message: 'Downloading CSV logs...', type: 'info' }));
-    const dataToParse = isAdminOrHR ? allAttendance : myAttendance;
+    const dataToParse = isAdminOrHR ? safeAllAttendance : safeMyAttendance;
     const csv = Papa.unparse(dataToParse);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
@@ -287,7 +294,7 @@ export const Attendance: React.FC = () => {
           <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">My Personal Clock History</span>
           </div>
-          {myAttendance.length === 0 ? (
+          {safeMyAttendance.length === 0 ? (
             <div className="p-8 text-center text-slate-400">No logs clocked for this profile.</div>
           ) : (
             <div className="overflow-x-auto">
@@ -302,7 +309,7 @@ export const Attendance: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200/50 dark:divide-slate-800/50">
-                  {myAttendance.map((rec) => (
+                  {safeMyAttendance.map((rec) => (
                     <tr key={rec.id} className="hover:bg-slate-50/30 dark:hover:bg-slate-850/30">
                       <td className="px-6 py-3.5 font-semibold">{rec.date}</td>
                       <td className="px-6 py-3.5 font-mono text-xs">{rec.checkIn || '--:--'}</td>

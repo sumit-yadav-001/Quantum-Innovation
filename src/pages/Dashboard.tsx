@@ -52,35 +52,41 @@ export const Dashboard: React.FC = () => {
   const todayStr = '2026-05-22'; // Current Mock Date
 
   // 1. Fetch data in parallel
-  const { data: employeesRes, isLoading: empsLoading, error: empsError } = useQuery({
+  const { data: employeesRes, isLoading: empsLoading, isError: empsError, refetch: refetchEmps } = useQuery({
     queryKey: ['employees', { limit: 100 }],
-    queryFn: () => apiClient.get(`${ENDPOINTS.EMPLOYEES}?limit=100`)
+    queryFn: () => apiClient.get(`${ENDPOINTS.EMPLOYEES}?limit=100`),
+    retry: 2
   });
 
   const { data: attendanceRes, isLoading: attsLoading } = useQuery({
     queryKey: ['attendance', { date: todayStr }],
-    queryFn: () => apiClient.get(`${ENDPOINTS.ATTENDANCE}?date=${todayStr}`)
+    queryFn: () => apiClient.get(`${ENDPOINTS.ATTENDANCE}?date=${todayStr}`),
+    retry: 2
   });
 
   const { data: myAttendanceRes } = useQuery({
     queryKey: ['attendance', { employeeId: user?.id }],
     queryFn: () => apiClient.get(`${ENDPOINTS.ATTENDANCE}?employeeId=${user?.id}`),
-    enabled: !!user?.id
+    enabled: !!user?.id,
+    retry: 2
   });
 
   const { data: leavesRes, isLoading: leavesLoading } = useQuery({
     queryKey: ['leaves'],
-    queryFn: () => apiClient.get(ENDPOINTS.LEAVES)
+    queryFn: () => apiClient.get(ENDPOINTS.LEAVES),
+    retry: 2
   });
 
   const { data: payrollStatsRes, isLoading: payrollLoading } = useQuery({
     queryKey: ['payrollStats', { month: '2026-05' }],
-    queryFn: () => apiClient.get(`${ENDPOINTS.PAYROLL_STATS}?month=2026-05`)
+    queryFn: () => apiClient.get(`${ENDPOINTS.PAYROLL_STATS}?month=2026-05`),
+    retry: 2
   });
 
   const { data: generalAttStatsRes } = useQuery({
     queryKey: ['attendanceStats', { company: true }],
-    queryFn: () => apiClient.get(ENDPOINTS.ATTENDANCE_STATS)
+    queryFn: () => apiClient.get(ENDPOINTS.ATTENDANCE_STATS),
+    retry: 2
   });
 
   // Punch Mutation
@@ -159,10 +165,10 @@ export const Dashboard: React.FC = () => {
   }
 
   if (empsError) {
-    return <ErrorState message="Could not compile dashboard widgets." onRetry={() => queryClient.refetchQueries()} />;
+    return <ErrorState message="Could not compile dashboard widgets." onRetry={() => refetchEmps()} />;
   }
 
-  // Calculate Metrics
+  // Calculate Metrics — safe fallbacks so dashboard never crashes
   const employees = employeesRes?.data?.data || [];
   const headcount = employees.filter((e: any) => e.status === 'ACTIVE').length;
   
@@ -230,7 +236,7 @@ export const Dashboard: React.FC = () => {
             Welcome back, {user?.name}!
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            AuraHR Dashboard / Corporate Overview. Today is {todayStr}
+            Quantum Innovations Dashboard / Corporate Overview. Today is {todayStr}
           </p>
         </div>
 

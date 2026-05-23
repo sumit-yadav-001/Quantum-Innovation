@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { CheckCircle, AlertTriangle, AlertCircle, Info, X } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../app/store';
-import { removeToast, ToastMessage } from '../../app/store/notificationSlice';
+import { removeToast } from '../../app/store/notificationSlice';
+import type { ToastMessage } from '../../app/store/notificationSlice';
 
 export const ToastContainer: React.FC = () => {
   const { toasts } = useAppSelector((state) => state.notifications);
