@@ -3,9 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 
-// Boot MSW before mounting React so the first API call is already intercepted.
-// If the service worker fails (e.g. first load, incognito), the app still works
-// via the inline fallback auth in Login.tsx.
+
 async function startApp() {
   try {
     const { worker } = await import('./mocks/browser')
