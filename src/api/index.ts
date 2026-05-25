@@ -1,5 +1,4 @@
-// Single import point for all RTK Query hooks.
-// Components should import from here, not from individual slice files.
+
 
 export { baseApi } from './baseApi'
 

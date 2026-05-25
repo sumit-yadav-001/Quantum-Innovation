@@ -16,7 +16,7 @@ export const notificationApi = baseApi.injectEndpoints({
         url: `${ENDPOINTS.NOTIFICATIONS}/${id}/read`,
         method: 'PATCH',
       }),
-      // Optimistic update — flip read flag immediately without waiting for server
+      
       onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
         const patch = dispatch(
           notificationApi.util.updateQueryData('getNotifications', undefined, (draft) => {
