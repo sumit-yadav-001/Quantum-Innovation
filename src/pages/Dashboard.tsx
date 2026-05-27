@@ -49,9 +49,9 @@ export const Dashboard: React.FC = () => {
   const [endDate, setEndDate] = useState('');
   const [reason, setReason] = useState('');
 
-  const todayStr = '2026-05-22'; // Current Mock Date
+  const todayStr = '2026-05-22';
 
-  // 1. Fetch data in parallel
+
   const { data: employeesRes, isLoading: empsLoading, isError: empsError, refetch: refetchEmps } = useQuery({
     queryKey: ['employees', { limit: 100 }],
     queryFn: () => apiClient.get(`${ENDPOINTS.EMPLOYEES}?limit=100`),
@@ -89,7 +89,7 @@ export const Dashboard: React.FC = () => {
     retry: 2
   });
 
-  // Punch Mutation
+
   const punchMutation = useMutation({
     mutationFn: async (action: 'IN' | 'OUT') => {
       const now = new Date();
@@ -123,7 +123,7 @@ export const Dashboard: React.FC = () => {
     }
   });
 
-  // Leave Mutation
+
   const leaveMutation = useMutation({
     mutationFn: async () => {
       await apiClient.post(ENDPOINTS.LEAVES, {
@@ -168,7 +168,7 @@ export const Dashboard: React.FC = () => {
     return <ErrorState message="Could not compile dashboard widgets." onRetry={() => refetchEmps()} />;
   }
 
-  // Calculate Metrics — safe fallbacks so dashboard never crashes
+
   const employees = employeesRes?.data?.data || [];
   const headcount = employees.filter((e: any) => e.status === 'ACTIVE').length;
   
@@ -181,13 +181,13 @@ export const Dashboard: React.FC = () => {
   const payrollStats = payrollStatsRes?.data || { totalOutflow: 0 };
   const monthlySalaryOutflow = payrollStats.totalOutflow;
 
-  // Find My Punch details
+
   const myPunches = myAttendanceRes?.data || [];
   const todayPunch = myPunches.find((a: any) => a.date === todayStr);
   const isPunchedIn = todayPunch && todayPunch.checkIn && !todayPunch.checkOut;
   const isPunchedOut = todayPunch && todayPunch.checkIn && todayPunch.checkOut;
 
-  // Chart Data: Department Breakdowns
+
   const deptDataMap: Record<string, number> = {};
   employees.forEach((emp: any) => {
     if (emp.status === 'ACTIVE') {
@@ -196,13 +196,13 @@ export const Dashboard: React.FC = () => {
   });
   const departmentChartData = Object.entries(deptDataMap).map(([name, value]) => ({ name, value }));
 
-  // Chart Data: Attendance Trends (Last 7 Days)
+
   const attendanceTrends = generalAttStatsRes?.data?.dailyStatsTrend || [];
 
-  // Chart Data: Payroll Trends (Last 6 Months)
+
   const payrollTrends = generalAttStatsRes?.data?.monthlySpendTrend || [];
 
-  // Chart Data: Leave Distribution Types
+
   const leaveTypesMap = { SICK: 0, CASUAL: 0, ANNUAL: 0 };
   leaves.forEach((l: any) => {
     if (l.status === 'APPROVED') {
@@ -211,7 +211,7 @@ export const Dashboard: React.FC = () => {
   });
   const leaveChartData = Object.entries(leaveTypesMap).map(([name, value]) => ({ name, value }));
 
-  // Recent activities list
+
   const recentActivities = [
     ...todayAttendance.slice(0, 5).map((a: any) => ({
       id: a.id,
@@ -229,7 +229,6 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Welcome header & Quick action */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="text-left">
           <h1 className="text-2xl font-bold font-display tracking-tight text-slate-800 dark:text-slate-100 leading-tight">
@@ -240,9 +239,7 @@ export const Dashboard: React.FC = () => {
           </p>
         </div>
 
-        {/* --- QUICK ACTIONS WIDGET --- */}
         <div className="flex items-center gap-2">
-          {/* Quick Punch Panel */}
           <div className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm">
             <Clock className="w-4 h-4 text-violet-500 shrink-0" />
             <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
@@ -270,7 +267,6 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* KPI Stats Panel */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <DashboardCard
           title="Active Workforce"
@@ -297,9 +293,7 @@ export const Dashboard: React.FC = () => {
         />
       </div>
 
-      {/* Analytical Charts Grids */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Attendance trend (2/3 width) */}
         <div className="lg:col-span-2 glassmorphism p-5 rounded-xl flex flex-col">
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 font-display">Workforce Attendance Trend</span>
@@ -325,7 +319,6 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Department Size Share (1/3 width) */}
         <div className="glassmorphism p-5 rounded-xl flex flex-col justify-between">
           <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 font-display mb-2 text-left block">
             Department Allocation
@@ -366,7 +359,6 @@ export const Dashboard: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Payroll Expense outflow (1/3 width) */}
         <div className="glassmorphism p-5 rounded-xl flex flex-col text-left">
           <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 font-display mb-4 block">
             Payroll Expenditure Trend
@@ -384,7 +376,6 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Leave categories distribution (1/3 width) */}
         <div className="glassmorphism p-5 rounded-xl flex flex-col text-left">
           <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 font-display mb-4 block">
             Leave Distribution (Approved)
@@ -402,7 +393,6 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Recent logs and alerts (1/3 width) */}
         <div className="glassmorphism p-5 rounded-xl flex flex-col text-left justify-between">
           <div>
             <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 font-display mb-4 block">
@@ -435,7 +425,6 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* --- LEAVE REQUEST MODAL --- */}
       <Modal
         isOpen={leaveModalOpen}
         onClose={() => setLeaveModalOpen(false)}

@@ -24,14 +24,14 @@ export const Leaves: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
 
-  // States
+
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<LeaveRequest | null>(null);
   const [rejectReasonModalOpen, setRejectReasonModalOpen] = useState(false);
   const [rejectionReasonText, setRejectionReasonText] = useState('');
   const [activeQueueTab, setActiveQueueTab] = useState<'my' | 'approvals'>('my');
 
-  // Leave Apply State
+
   const [leaveType, setLeaveType] = useState<'SICK' | 'CASUAL' | 'ANNUAL'>('CASUAL');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -39,7 +39,7 @@ export const Leaves: React.FC = () => {
 
   const isAdminOrHR = user?.role === 'ADMIN' || user?.role === 'HR_MANAGER' || user?.role === 'TEAM_LEAD';
 
-  // 1. Fetch All Leaves (for Admin/HR queue)
+
   const { data: allLeaves = [], isLoading: allLoading } = useQuery<LeaveRequest[]>({
     queryKey: ['leaves'],
     queryFn: async () => {
@@ -48,7 +48,7 @@ export const Leaves: React.FC = () => {
     }
   });
 
-  // 2. Fetch My Personal Leaves
+
   const { data: myLeaves = [], isLoading: myLoading } = useQuery<LeaveRequest[]>({
     queryKey: ['leaves', { employeeId: user?.id }],
     queryFn: async () => {
@@ -58,7 +58,7 @@ export const Leaves: React.FC = () => {
     enabled: !!user?.id
   });
 
-  // 3. Fetch My Personal Leave Balance
+
   const { data: myBalance } = useQuery<LeaveBalance>({
     queryKey: ['leaveBalances', user?.id],
     queryFn: async () => {
@@ -68,7 +68,7 @@ export const Leaves: React.FC = () => {
     enabled: !!user?.id
   });
 
-  // Apply Leave Mutation
+
   const applyMutation = useMutation({
     mutationFn: async () => {
       await apiClient.post(ENDPOINTS.LEAVES, {
@@ -100,7 +100,7 @@ export const Leaves: React.FC = () => {
     }
   });
 
-  // Approve/Reject Mutation
+
   const processMutation = useMutation({
     mutationFn: async ({ id, status, rejectionReason }: { id: string; status: 'APPROVED' | 'REJECTED'; rejectionReason?: string }) => {
       await apiClient.patch(`${ENDPOINTS.LEAVES}/${id}`, { status, rejectionReason });
@@ -156,16 +156,15 @@ export const Leaves: React.FC = () => {
     return <Loader message="Accessing leave balances and registry..." />;
   }
 
-  // Safe array guards — prevent .filter crash if MSW returns unexpected shape
+
   const safeAllLeaves = Array.isArray(allLeaves) ? allLeaves : [];
   const safeMyLeaves = Array.isArray(myLeaves) ? myLeaves : [];
 
-  // Calculate leaves pending in approval queue
+
   const pendingApprovals = safeAllLeaves.filter(l => l.status === 'PENDING');
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
         <div>
           <h1 className="text-2xl font-bold font-display tracking-tight text-slate-800 dark:text-slate-100">
@@ -185,7 +184,6 @@ export const Leaves: React.FC = () => {
         </Button>
       </div>
 
-      {/* Leave Balances Grid */}
       {myBalance && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
           <div className="glassmorphism p-5 rounded-xl border-l-4 border-violet-500 flex justify-between items-center">
@@ -218,7 +216,6 @@ export const Leaves: React.FC = () => {
         </div>
       )}
 
-      {/* Role-aware Navigation tabs */}
       {isAdminOrHR && (
         <div className="border-b border-slate-200 dark:border-slate-800 flex gap-4 overflow-x-auto">
           <button
@@ -244,9 +241,8 @@ export const Leaves: React.FC = () => {
         </div>
       )}
 
-      {/* Leaves Listing Panels */}
       {(!isAdminOrHR || activeQueueTab === 'my') ? (
-        /* Personal History */
+        
         <div className="glassmorphism rounded-xl overflow-hidden text-left">
           <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">My Personal Leave History</span>
@@ -285,7 +281,6 @@ export const Leaves: React.FC = () => {
           )}
         </div>
       ) : (
-        /* HR/Admin approvals queue */
         <div className="glassmorphism rounded-xl overflow-hidden text-left">
           <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Incoming Leave Requests (Pending Queue)</span>
@@ -342,7 +337,6 @@ export const Leaves: React.FC = () => {
         </div>
       )}
 
-      {/* --- APPLY LEAVE MODAL --- */}
       <Modal
         isOpen={applyModalOpen}
         onClose={() => setApplyModalOpen(false)}
@@ -405,7 +399,6 @@ export const Leaves: React.FC = () => {
         </div>
       </Modal>
 
-      {/* --- REJECTION REASON MODAL --- */}
       <Modal
         isOpen={rejectReasonModalOpen}
         onClose={() => setRejectReasonModalOpen(false)}

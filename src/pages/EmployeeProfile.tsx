@@ -28,11 +28,11 @@ export const EmployeeProfile: React.FC = () => {
   const [payslipModalOpen, setPayslipModalOpen] = useState(false);
   const [selectedPayslip, setSelectedPayslip] = useState<PayrollRecord | null>(null);
 
-  // 1. Fetch Employee Profile
+
   const { data: employee, isLoading: empLoading, isError: empError } = useQuery<Employee>({
     queryKey: ['employee', id],
     queryFn: async () => {
-      // Find employee in listing since we return all
+
       const res = await apiClient.get(`${ENDPOINTS.EMPLOYEES}`);
       const list = res.data.data as Employee[];
       const found = list.find(e => e.id === id);
@@ -41,7 +41,7 @@ export const EmployeeProfile: React.FC = () => {
     }
   });
 
-  // 2. Fetch Attendance for Employee
+
   const { data: attendance = [], isLoading: attLoading } = useQuery<AttendanceRecord[]>({
     queryKey: ['attendance', { employeeId: id }],
     queryFn: async () => {
@@ -52,7 +52,7 @@ export const EmployeeProfile: React.FC = () => {
     enabled: !!id
   });
 
-  // 3. Fetch Leaves for Employee
+
   const { data: leaves = [], isLoading: leavesLoading } = useQuery<LeaveRequest[]>({
     queryKey: ['leaves', { employeeId: id }],
     queryFn: async () => {
@@ -63,7 +63,7 @@ export const EmployeeProfile: React.FC = () => {
     enabled: !!id
   });
 
-  // 4. Fetch Payroll history
+
   const { data: payrolls = [], isLoading: payLoading } = useQuery<PayrollRecord[]>({
     queryKey: ['payroll'],
     queryFn: async () => {
@@ -101,7 +101,6 @@ export const EmployeeProfile: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header Back button */}
       <div className="flex items-center gap-2 text-left">
         <Link to="/employees">
           <Button variant="outline" size="sm" className="p-1.5 cursor-pointer">
@@ -118,9 +117,7 @@ export const EmployeeProfile: React.FC = () => {
         </div>
       </div>
 
-      {/* Profile Overview Card */}
       <div className="glassmorphism p-6 rounded-2xl flex flex-col md:flex-row gap-6 items-center text-left relative overflow-hidden">
-        {/* Background Accent Grid */}
         <div className="absolute right-0 top-0 translate-x-12 -translate-y-12 w-48 h-48 rounded-full bg-violet-500/5 dark:bg-violet-400/5 blur-2xl pointer-events-none" />
 
         <img 
@@ -170,7 +167,6 @@ export const EmployeeProfile: React.FC = () => {
         </div>
       </div>
 
-      {/* Tabs list */}
       <div className="border-b border-slate-200 dark:border-slate-800 flex gap-4 overflow-x-auto">
         <button
           onClick={() => setActiveTab('info')}
@@ -226,11 +222,9 @@ export const EmployeeProfile: React.FC = () => {
         </button>
       </div>
 
-      {/* Tab Panels */}
       <div>
         {activeTab === 'info' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-            {/* Employment Card */}
             <div className="glassmorphism p-5 rounded-xl space-y-4">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest block border-b border-slate-100 dark:border-slate-800 pb-2">Employment Details</span>
               <div className="grid grid-cols-2 gap-y-3.5 text-sm">
@@ -261,7 +255,6 @@ export const EmployeeProfile: React.FC = () => {
               </div>
             </div>
 
-            {/* Financial Config */}
             <div className="glassmorphism p-5 rounded-xl space-y-4">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest block border-b border-slate-100 dark:border-slate-800 pb-2">Salary Config Breakdown</span>
               <div className="grid grid-cols-2 gap-y-3.5 text-sm">
@@ -286,7 +279,6 @@ export const EmployeeProfile: React.FC = () => {
           </div>
         )}
 
-        {/* Tab Panel: Attendance */}
         {activeTab === 'attendance' && (
           <div className="glassmorphism rounded-xl overflow-hidden text-left">
             <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
@@ -327,7 +319,6 @@ export const EmployeeProfile: React.FC = () => {
           </div>
         )}
 
-        {/* Tab Panel: Leaves */}
         {activeTab === 'leaves' && (
           <div className="glassmorphism rounded-xl overflow-hidden text-left">
             <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
@@ -371,7 +362,6 @@ export const EmployeeProfile: React.FC = () => {
           </div>
         )}
 
-        {/* Tab Panel: Payroll & Payslip list */}
         {activeTab === 'payroll' && (
           <div className="glassmorphism rounded-xl overflow-hidden text-left">
             <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
@@ -425,7 +415,6 @@ export const EmployeeProfile: React.FC = () => {
         )}
       </div>
 
-      {/* --- PAYSLIP VIEWER MODAL --- */}
       <Modal
         isOpen={payslipModalOpen}
         onClose={() => setPayslipModalOpen(false)}
@@ -434,7 +423,6 @@ export const EmployeeProfile: React.FC = () => {
       >
         {selectedPayslip && (
           <div className="space-y-6 p-4 text-left dark:text-slate-900 bg-white rounded-lg border border-slate-200">
-            {/* Payslip Header */}
             <div className="flex justify-between items-start border-b border-slate-200 pb-4">
               <div className="space-y-0.5">
                 <span className="font-bold text-lg text-violet-750 font-display">AuraHR Corporation</span>
@@ -446,7 +434,6 @@ export const EmployeeProfile: React.FC = () => {
               </div>
             </div>
 
-            {/* Employee Information */}
             <div className="grid grid-cols-2 gap-4 text-xs bg-slate-50 p-3 rounded-lg border border-slate-100">
               <div>
                 <span className="text-[10px] text-slate-450 block uppercase font-medium">Employee Name</span>
@@ -460,7 +447,6 @@ export const EmployeeProfile: React.FC = () => {
               </div>
             </div>
 
-            {/* Salary Breakdown Table */}
             <div className="space-y-2 text-xs">
               <div className="grid grid-cols-2 border-b border-slate-200 pb-1 font-bold text-slate-600">
                 <span>EARNINGS & ALLOWANCES</span>
@@ -490,7 +476,6 @@ export const EmployeeProfile: React.FC = () => {
               </div>
             </div>
 
-            {/* Payslip Footer */}
             <div className="border-t border-slate-200 pt-6 text-[10px] text-slate-400 text-center flex justify-between">
               <span>Payment Mode: Direct Corporate Credit</span>
               <span>Status: {selectedPayslip.status}</span>

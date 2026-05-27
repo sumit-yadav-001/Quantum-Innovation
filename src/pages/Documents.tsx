@@ -32,11 +32,11 @@ export const Documents: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
 
-  // States
+
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
   
-  // Upload States
+
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadName, setUploadName] = useState('');
   const [uploadCategory, setUploadCategory] = useState<DocumentCategory>('POLICY');
@@ -44,13 +44,13 @@ export const Documents: React.FC = () => {
   const [uploadSize, setUploadSize] = useState('1.5 MB');
   const [uploadFileType, setUploadFileType] = useState('pdf');
 
-  // Preview State
+
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<DocumentRecord | null>(null);
 
   const isAdminOrHR = user?.role === 'ADMIN' || user?.role === 'HR_MANAGER';
 
-  // 1. Fetch Documents (role-aware: general employee only sees their own documents & global policies)
+
   const { data: allDocuments = [], isLoading: docsLoading, isError: docsError, refetch: refetchDocs } = useQuery<DocumentRecord[]>({
     queryKey: ['documents'],
     queryFn: async () => {
@@ -60,7 +60,7 @@ export const Documents: React.FC = () => {
     }
   });
 
-  // 2. Fetch candidates list for dropdown (Admins/HR can associate documents with employees)
+
   const { data: employeesRes } = useQuery({
     queryKey: ['employees-for-docs-dropdown'],
     queryFn: async () => {
@@ -74,7 +74,7 @@ export const Documents: React.FC = () => {
 
   const employeeCandidates = useMemo(() => employeesRes?.data || [], [employeesRes]);
 
-  // 3. Upload Mutation
+
   const uploadMutation = useMutation({
     mutationFn: async (payload: { name: string; category: DocumentCategory; employeeId?: string; fileType: string; size: string }) => {
       await apiClient.post(ENDPOINTS.DOCUMENTS_UPLOAD, payload);
@@ -100,7 +100,7 @@ export const Documents: React.FC = () => {
     }
   });
 
-  // 4. Delete Mutation
+
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       await apiClient.delete(`${ENDPOINTS.DOCUMENTS}/${id}`);
@@ -122,26 +122,24 @@ export const Documents: React.FC = () => {
     }
   });
 
-  // Filter logic (category + search + role boundaries)
+
   const filteredDocuments = useMemo(() => {
     let result = [...allDocuments];
 
-    // Role limits: If the user is a normal employee, they only see documents associated with their ID OR global policy documents (no employeeId)
+
     if (user?.role === 'EMPLOYEE') {
       result = result.filter(doc => doc.category === 'POLICY' || doc.employeeId === user.id);
     } else if (user?.role === 'TEAM_LEAD') {
-      // Team leads can see policies, their own documents, or any document associated with employees in their department
-      // To keep it simple & compliant: allow viewing policies and any document where employeeId is in their department, or their own.
-      // Since allDocuments has employeeId, we can show matching ones, or let team leads view all documents (usually TLs have partial visibility, let's filter)
+
       result = result.filter(doc => doc.category === 'POLICY' || doc.employeeId === user.id || (doc.employeeName && doc.employeeId)); 
     }
 
-    // Category filter
+
     if (activeCategory !== 'All') {
       result = result.filter(doc => doc.category === activeCategory.toUpperCase());
     }
 
-    // Search query filter
+
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       result = result.filter(doc => 
@@ -166,7 +164,7 @@ export const Documents: React.FC = () => {
       return;
     }
     
-    // Set file extension from fileType dropdown
+
     let formattedName = uploadName;
     if (!uploadName.endsWith(`.${uploadFileType}`)) {
       formattedName = `${uploadName}.${uploadFileType}`;
@@ -202,7 +200,6 @@ export const Documents: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
         <div>
           <h1 className="text-2xl font-bold font-display tracking-tight text-slate-800 dark:text-slate-100">
@@ -224,9 +221,7 @@ export const Documents: React.FC = () => {
         )}
       </div>
 
-      {/* Main Locker Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start text-left">
-        {/* Category Sidebar */}
         <div className="glassmorphism p-4 rounded-xl space-y-2 lg:col-span-1">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 block mb-3">
             Locker Divisions
@@ -252,9 +247,7 @@ export const Documents: React.FC = () => {
           </div>
         </div>
 
-        {/* Documents Grid / List */}
         <div className="space-y-4 lg:col-span-3">
-          {/* Filters Bar */}
           <div className="glassmorphism p-3 rounded-xl flex items-center">
             <div className="relative w-full">
               <Input
@@ -267,7 +260,6 @@ export const Documents: React.FC = () => {
             </div>
           </div>
 
-          {/* Grid list of files */}
           {filteredDocuments.length === 0 ? (
             <div className="glassmorphism rounded-xl py-12 text-center text-slate-450">
               <Database className="w-10 h-10 text-slate-300 dark:text-slate-800 mx-auto mb-3" />
@@ -345,7 +337,6 @@ export const Documents: React.FC = () => {
         </div>
       </div>
 
-      {/* --- SECURE DEPOSIT UPLOAD MODAL --- */}
       <Modal
         isOpen={uploadModalOpen}
         onClose={() => setUploadModalOpen(false)}
@@ -394,7 +385,6 @@ export const Documents: React.FC = () => {
               onChange={(e) => setUploadSize(e.target.value)}
             />
 
-            {/* Candidate Employee drop-down */}
             <Select
               label="Associated Employee (Optional)"
               options={[
@@ -406,7 +396,6 @@ export const Documents: React.FC = () => {
             />
           </div>
 
-          {/* Drag & Drop simulated area */}
           <div className="border border-dashed border-slate-300 dark:border-slate-700 p-8 rounded-xl text-center space-y-1 bg-slate-50/50 dark:bg-slate-900/50">
             <Upload className="w-8 h-8 text-slate-400 mx-auto" />
             <p className="text-xs text-slate-650 dark:text-slate-450 font-medium">
@@ -433,7 +422,6 @@ export const Documents: React.FC = () => {
         </form>
       </Modal>
 
-      {/* --- SECURE PREVIEW MODAL --- */}
       <Modal
         isOpen={previewModalOpen}
         onClose={() => setPreviewModalOpen(false)}
@@ -441,10 +429,8 @@ export const Documents: React.FC = () => {
       >
         {selectedDoc && (
           <div className="space-y-4 text-left leading-relaxed">
-            {/* Template previews depending on type */}
             <div className="border border-slate-200 dark:border-slate-800 rounded-lg p-6 bg-white dark:bg-slate-900 min-h-64 flex flex-col justify-between font-serif text-xs text-slate-700 dark:text-slate-300 leading-normal">
               
-              {/* PDF Preview Content */}
               {selectedDoc.fileType === 'pdf' && (
                 <div className="space-y-3">
                   <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
@@ -466,7 +452,6 @@ export const Documents: React.FC = () => {
                 </div>
               )}
 
-              {/* DOCX Preview Content */}
               {selectedDoc.fileType === 'docx' && (
                 <div className="space-y-3 font-sans">
                   <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2 text-[9px]">
@@ -487,11 +472,9 @@ export const Documents: React.FC = () => {
                 </div>
               )}
 
-              {/* Image Scanner Preview */}
               {(selectedDoc.fileType === 'png' || selectedDoc.fileType === 'jpg' || selectedDoc.fileType === 'jpeg') && (
                 <div className="flex flex-col items-center justify-center py-6 space-y-4 font-sans text-center">
                   <div className="w-56 h-36 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl p-3 text-white flex flex-col justify-between shadow-md relative overflow-hidden">
-                    {/* Watermark */}
                     <div className="absolute right-0 bottom-0 opacity-5 text-8xl font-bold font-sans pointer-events-none select-none">ID</div>
                     
                     <div className="flex justify-between items-start">
@@ -518,7 +501,6 @@ export const Documents: React.FC = () => {
                 </div>
               )}
 
-              {/* Spreadsheet data Preview */}
               {selectedDoc.fileType === 'xlsx' && (
                 <div className="space-y-3 font-mono text-[10px]">
                   <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2 text-[9px] font-sans">
@@ -557,14 +539,12 @@ export const Documents: React.FC = () => {
                 </div>
               )}
 
-              {/* Document footer watermark info */}
               <div className="flex justify-between border-t border-slate-100 dark:border-slate-800 pt-2 mt-4 font-sans text-[8px] text-slate-400">
                 <span>SECURE HASH: SHA-256_{selectedDoc.id}</span>
                 <span>Security Access Level: {user?.role}</span>
               </div>
             </div>
 
-            {/* Actions for Modal */}
             <div className="flex justify-end gap-2 pt-2">
               <Button
                 variant="outline"

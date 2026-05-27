@@ -29,17 +29,17 @@ export const Payroll: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
 
-  // Filters
+
   const [selectedMonth, setSelectedMonth] = useState('2026-05');
   const [selectedDept, setSelectedDept] = useState('All');
   
-  // Payslip Modal State
+
   const [payslipModalOpen, setPayslipModalOpen] = useState(false);
   const [selectedPayroll, setSelectedPayroll] = useState<PayrollRecord | null>(null);
 
   const isAdminOrHR = user?.role === 'ADMIN' || user?.role === 'HR_MANAGER';
 
-  // 1. Fetch Payroll Records
+
   const { data: payrollRecords = [], isLoading: recordsLoading, isError: recordsError, refetch: refetchRecords } = useQuery<PayrollRecord[]>({
     queryKey: ['payroll', { month: selectedMonth, department: selectedDept }],
     queryFn: async () => {
@@ -54,7 +54,7 @@ export const Payroll: React.FC = () => {
     }
   });
 
-  // 2. Fetch Payroll Stats (outflows, trends)
+
   const { data: payrollStats, isLoading: statsLoading, isError: statsError } = useQuery<{
     totalOutflow: number;
     avgSalary: number;
@@ -68,10 +68,10 @@ export const Payroll: React.FC = () => {
       });
       return res.data;
     },
-    enabled: isAdminOrHR // only relevant for admin/HR
+    enabled: isAdminOrHR
   });
 
-  // 3. Mutation to Pay a Record
+
   const payRecordMutation = useMutation({
     mutationFn: async (id: string) => {
       await apiClient.patch(`${ENDPOINTS.PAYROLL}/${id}`, { status: 'PAID' });
@@ -85,7 +85,7 @@ export const Payroll: React.FC = () => {
         message: 'The employee salary record status was updated to PAID.',
         type: 'success'
       }));
-      // Update local modal view if open
+
       if (selectedPayroll && selectedPayroll.id === recordId) {
         setSelectedPayroll(prev => prev ? { ...prev, status: 'PAID', paidDate: new Date().toISOString().split('T')[0] } : null);
       }
@@ -99,10 +99,10 @@ export const Payroll: React.FC = () => {
     }
   });
 
-  // 4. Mutation to Bulk Pay (Run Payroll) for selected month
+
   const runPayrollMutation = useMutation({
     mutationFn: async () => {
-      // Find all records that are PROCESSING or PENDING for the selected month and pay them
+
       const targetRecords = payrollRecords.filter(r => r.status !== 'PAID');
       for (const record of targetRecords) {
         await apiClient.patch(`${ENDPOINTS.PAYROLL}/${record.id}`, { status: 'PAID' });
@@ -127,14 +127,14 @@ export const Payroll: React.FC = () => {
     }
   });
 
-  // Client-side filtering for Employee/Lead view
+
   const personalPayrollRecords = useMemo(() => {
     if (isAdminOrHR) return payrollRecords;
-    // For general employees and team leads (non-HR), show only their personal records
+
     return payrollRecords.filter(p => p.employeeId === user?.id);
   }, [payrollRecords, user, isAdminOrHR]);
 
-  // Employee Personal stats
+
   const employeeStats = useMemo(() => {
     if (isAdminOrHR) return null;
     const paidRecords = personalPayrollRecords.filter(r => r.status === 'PAID');
@@ -207,12 +207,11 @@ export const Payroll: React.FC = () => {
     return <ErrorState onRetry={() => { refetchRecords(); }} message="Failed to load payroll records." />;
   }
 
-  // Count unprocessed payrolls for the warning alert
+
   const pendingCount = payrollRecords.filter(r => r.status !== 'PAID').length;
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
         <div>
           <h1 className="text-2xl font-bold font-display tracking-tight text-slate-800 dark:text-slate-100">
@@ -242,7 +241,6 @@ export const Payroll: React.FC = () => {
         )}
       </div>
 
-      {/* ADMIN / HR KPI Cards & Trend Analytics */}
       {isAdminOrHR && payrollStats && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-left">
@@ -295,7 +293,6 @@ export const Payroll: React.FC = () => {
             </div>
           </div>
 
-          {/* Spend Trend Chart */}
           {formattedChartData.length > 0 && (
             <div className="glassmorphism p-5 rounded-xl text-left">
               <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">
@@ -326,7 +323,6 @@ export const Payroll: React.FC = () => {
         </>
       )}
 
-      {/* EMPLOYEE Self-Service KPI Cards */}
       {!isAdminOrHR && employeeStats && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
           <div className="glassmorphism p-5 rounded-xl border-l-4 border-violet-500 flex justify-between items-center">
@@ -367,7 +363,6 @@ export const Payroll: React.FC = () => {
         </div>
       )}
 
-      {/* FILTER CONTROL CARD (only for ADMIN/HR) */}
       {isAdminOrHR && (
         <div className="glassmorphism p-4 rounded-xl flex flex-col md:flex-row gap-4 items-end">
           <div className="w-full md:w-1/3 text-left">
@@ -417,7 +412,6 @@ export const Payroll: React.FC = () => {
         </div>
       )}
 
-      {/* WARNING/ALERT IF PENDING DISBURSEMENTS */}
       {isAdminOrHR && pendingCount > 0 && (
         <div className="bg-amber-500/10 border border-amber-500/25 rounded-xl p-4 flex gap-3 text-left items-center">
           <CircleAlert className="w-5 h-5 text-amber-500 shrink-0" />
@@ -427,7 +421,6 @@ export const Payroll: React.FC = () => {
         </div>
       )}
 
-      {/* Roster Listing Card */}
       <div className="glassmorphism rounded-xl overflow-hidden text-left">
         <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
@@ -440,7 +433,7 @@ export const Payroll: React.FC = () => {
               size="sm"
               className="gap-1.5 cursor-pointer text-xs"
               onClick={() => {
-                // Generate CSV payload for the active listing
+
                 const header = ['Employee Name', 'Department', 'Month', 'Base Salary', 'Allowances', 'Deductions', 'Net Salary', 'Status', 'Paid Date'];
                 const rows = personalPayrollRecords.map(r => [
                   r.employeeName,
@@ -536,7 +529,6 @@ export const Payroll: React.FC = () => {
         )}
       </div>
 
-      {/* --- PAYSLIP DETAILS MODAL --- */}
       <Modal
         isOpen={payslipModalOpen}
         onClose={() => setPayslipModalOpen(false)}
@@ -544,7 +536,6 @@ export const Payroll: React.FC = () => {
       >
         {selectedPayroll && (
           <div className="space-y-6 text-left">
-            {/* Payslip Corporate Header */}
             <div className="flex justify-between items-start border-b border-slate-200 dark:border-slate-800 pb-5">
               <div>
                 <h2 className="text-xl font-bold font-display tracking-tight text-violet-650 dark:text-violet-400">
@@ -568,7 +559,6 @@ export const Payroll: React.FC = () => {
               </div>
             </div>
 
-            {/* Employee Block */}
             <div className="grid grid-cols-2 gap-4 text-xs border-b border-slate-100 dark:border-slate-850 pb-5">
               <div>
                 <span className="text-slate-400 block mb-1">Prepared For</span>
@@ -586,9 +576,7 @@ export const Payroll: React.FC = () => {
               </div>
             </div>
 
-            {/* Configurator breakdown breakdown */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs leading-normal">
-              {/* Earnings column */}
               <div className="space-y-2">
                 <h3 className="font-bold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800 pb-1.5 uppercase tracking-wider text-[10px]">
                   Salary Earnings
@@ -607,7 +595,6 @@ export const Payroll: React.FC = () => {
                 </div>
               </div>
 
-              {/* Deductions column */}
               <div className="space-y-2">
                 <h3 className="font-bold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800 pb-1.5 uppercase tracking-wider text-[10px]">
                   Deductions & Taxes
@@ -623,7 +610,6 @@ export const Payroll: React.FC = () => {
               </div>
             </div>
 
-            {/* Total credit box */}
             <div className="p-4 bg-violet-500/5 dark:bg-violet-400/5 border border-violet-500/10 rounded-xl flex justify-between items-center mt-6">
               <div>
                 <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Net Salary Disbursed</span>
@@ -636,7 +622,6 @@ export const Payroll: React.FC = () => {
               </div>
             </div>
 
-            {/* Footer buttons */}
             <div className="flex flex-col sm:flex-row gap-2 justify-between pt-4 border-t border-slate-200 dark:border-slate-800 mt-8">
               <Button
                 variant="outline"

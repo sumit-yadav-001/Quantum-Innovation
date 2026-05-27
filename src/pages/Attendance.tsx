@@ -27,19 +27,19 @@ export const Attendance: React.FC = () => {
 
   const isAdminOrHR = user?.role === 'ADMIN' || user?.role === 'HR_MANAGER' || user?.role === 'TEAM_LEAD';
 
-  // 1. Fetch Today's Attendance logs (For Admin/HR)
+
   const { data: allAttendance = [], isLoading: allLoading } = useQuery<AttendanceRecord[]>({
     queryKey: ['attendance', { date: filterDate }],
     queryFn: async () => {
       const res = await apiClient.get(ENDPOINTS.ATTENDANCE, { params: { date: filterDate } });
-      // MSW returns array directly — handle both array and wrapped object
+
       const raw = res.data;
       return Array.isArray(raw) ? raw : (raw?.data ?? []);
     },
     enabled: isAdminOrHR
   });
 
-  // 2. Fetch My Personal Attendance Logs (For Employees)
+
   const { data: myAttendance = [], isLoading: myLoading } = useQuery<AttendanceRecord[]>({
     queryKey: ['attendance', { employeeId: user?.id }],
     queryFn: async () => {
@@ -50,7 +50,7 @@ export const Attendance: React.FC = () => {
     enabled: !!user?.id
   });
 
-  // 3. Fetch Personal/Company Stats
+
   const { data: attStatsRes } = useQuery({
     queryKey: ['attendanceStats', { employeeId: isAdminOrHR ? '' : user?.id }],
     queryFn: async () => {
@@ -60,7 +60,7 @@ export const Attendance: React.FC = () => {
     }
   });
 
-  // Punch Mutation
+
   const punchMutation = useMutation({
     mutationFn: async (action: 'IN' | 'OUT') => {
       const now = new Date();
@@ -90,7 +90,7 @@ export const Attendance: React.FC = () => {
 
   const stats = attStatsRes || { presentPercentage: 0, totalPresents: 0, totalLates: 0, totalLeaves: 0, totalAbsents: 0 };
 
-  // Filter attendance log by search query — safe array check
+
   const safeAllAttendance = Array.isArray(allAttendance) ? allAttendance : [];
   const safeMyAttendance = Array.isArray(myAttendance) ? myAttendance : [];
 
@@ -98,12 +98,12 @@ export const Attendance: React.FC = () => {
     rec.employeeName?.toLowerCase().includes(employeeSearch.toLowerCase())
   );
 
-  // Check today's punch state for the logged in user
+
   const personalTodayRecord = safeMyAttendance.find((rec) => rec.date === todayStr);
   const isPunchedIn = personalTodayRecord && personalTodayRecord.checkIn && !personalTodayRecord.checkOut;
   const isPunchedOut = personalTodayRecord && personalTodayRecord.checkIn && personalTodayRecord.checkOut;
 
-  // Render Attendance Status Icon
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'PRESENT':
@@ -138,7 +138,6 @@ export const Attendance: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
         <div>
           <h1 className="text-2xl font-bold font-display tracking-tight text-slate-800 dark:text-slate-100">
@@ -153,7 +152,6 @@ export const Attendance: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Quick Punch Panel (for self service) */}
           <div className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm">
             <Clock className="w-4 h-4 text-violet-500" />
             <span className="text-xs font-semibold">
@@ -181,7 +179,6 @@ export const Attendance: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats Board */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-left">
         <div className="glassmorphism p-4 rounded-xl flex flex-col justify-between h-24">
           <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Attendance Rate</span>
@@ -210,10 +207,8 @@ export const Attendance: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Roster Logs (For admin/hr/lead) */}
       {isAdminOrHR ? (
         <div className="space-y-4 text-left">
-          {/* Query Filter panel */}
           <div className="glassmorphism p-4 rounded-xl flex flex-col md:flex-row gap-4 items-end">
             <div className="w-full md:w-1/3">
               <Input
@@ -247,7 +242,6 @@ export const Attendance: React.FC = () => {
             </Button>
           </div>
 
-          {/* Records Table */}
           <div className="glassmorphism rounded-xl overflow-hidden">
             {filteredAttendance.length === 0 ? (
               <div className="p-8 text-center text-slate-400">No attendance clock events on this date.</div>
@@ -280,7 +274,7 @@ export const Attendance: React.FC = () => {
           </div>
         </div>
       ) : (
-        /* Personal Logs Table (For self-service Employee) */
+        
         <div className="glassmorphism rounded-xl overflow-hidden text-left">
           <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">My Personal Clock History</span>

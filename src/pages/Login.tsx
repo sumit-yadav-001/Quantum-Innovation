@@ -28,7 +28,7 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-// ─── Fallback mock auth (when MSW service worker is not active) ───────────────
+
 const MOCK_CREDENTIALS: Record<string, {
   password: string;
   user: { id: string; name: string; email: string; role: string; department: string; designation: string; avatar: string }
@@ -58,9 +58,7 @@ function mockAuthFallback(email: string, password: string) {
   }
   return null;
 }
-// ─────────────────────────────────────────────────────────────────────────────
 
-// Feature highlights shown on the left branding panel
 const FEATURES = [
   { icon: <Users className="w-4 h-4" />, label: 'Employee Management', desc: 'Full workforce directory & profiles' },
   { icon: <CalendarCheck className="w-4 h-4" />, label: 'Attendance Tracking', desc: 'Real-time punch-in/out & reports' },
@@ -126,12 +124,9 @@ export const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex bg-slate-950 overflow-hidden">
 
-      {/* ── LEFT BRANDING PANEL ─────────────────────────────────────────── */}
       <div className="hidden lg:flex lg:w-[52%] relative flex-col justify-between p-12 overflow-hidden">
-        {/* Gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-violet-950 via-slate-900 to-indigo-950" />
 
-        {/* Decorative grid */}
         <div
           className="absolute inset-0 opacity-[0.04]"
           style={{
@@ -140,13 +135,10 @@ export const Login: React.FC = () => {
           }}
         />
 
-        {/* Glow orbs */}
         <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Content */}
         <div className="relative z-10">
-          {/* Logo */}
           <div className="flex items-center gap-3 mb-16">
             <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center shadow-lg shadow-violet-600/40">
               <Sparkles className="w-5 h-5 text-white" />
@@ -157,7 +149,6 @@ export const Login: React.FC = () => {
             </div>
           </div>
 
-          {/* Headline */}
           <div className="space-y-4 mb-12">
             <h1 className="text-4xl font-bold text-white font-display leading-tight tracking-tight">
               Manage your entire<br />
@@ -170,7 +161,6 @@ export const Login: React.FC = () => {
             </p>
           </div>
 
-          {/* Feature list */}
           <div className="space-y-4">
             {FEATURES.map((f, i) => (
               <div key={i} className="flex items-center gap-4 group">
@@ -186,7 +176,6 @@ export const Login: React.FC = () => {
           </div>
         </div>
 
-        {/* Bottom stats bar */}
         <div className="relative z-10 flex items-center gap-8 pt-8 border-t border-white/5">
           {[
             { value: '26+', label: 'Employees' },
@@ -201,14 +190,11 @@ export const Login: React.FC = () => {
         </div>
       </div>
 
-      {/* ── RIGHT FORM PANEL ────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 relative bg-slate-950">
-        {/* Subtle top-right glow */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-violet-600/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="w-full max-w-sm relative z-10">
 
-          {/* Mobile logo (hidden on lg) */}
           <div className="flex items-center gap-2.5 mb-10 lg:hidden">
             <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-white" />
@@ -216,7 +202,6 @@ export const Login: React.FC = () => {
             <span className="font-bold text-white text-base font-display">Quantum Innovations</span>
           </div>
 
-          {/* Form header */}
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-white font-display tracking-tight mb-1">
               Sign in to your account
@@ -226,7 +211,6 @@ export const Login: React.FC = () => {
             </p>
           </div>
 
-          {/* Error alert */}
           {error && (
             <div className="mb-5 p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-xs font-medium flex items-center gap-2.5">
               <ShieldAlert className="w-4 h-4 shrink-0" />
@@ -234,9 +218,7 @@ export const Login: React.FC = () => {
             </div>
           )}
 
-          {/* Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* Email */}
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
                 Corporate Email
@@ -259,7 +241,6 @@ export const Login: React.FC = () => {
               )}
             </div>
 
-            {/* Password */}
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
                 Password
@@ -282,7 +263,6 @@ export const Login: React.FC = () => {
               )}
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading || loginMutation.isPending}
@@ -302,14 +282,12 @@ export const Login: React.FC = () => {
             </button>
           </form>
 
-          {/* Divider */}
           <div className="flex items-center gap-3 my-6">
             <div className="flex-1 h-px bg-slate-800" />
             <span className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest">Quick Demo Access</span>
             <div className="flex-1 h-px bg-slate-800" />
           </div>
 
-          {/* Demo credential buttons */}
           <div className="grid grid-cols-2 gap-2">
             {[
               { role: 'ADMIN' as const,    label: 'Administrator', sub: 'Full system access',    color: 'violet' },
@@ -332,7 +310,6 @@ export const Login: React.FC = () => {
             ))}
           </div>
 
-          {/* Footer */}
           <p className="text-center text-[10px] text-slate-700 mt-8">
             © 2026 Quantum Innovations · Enterprise HR Platform · v2.0
           </p>

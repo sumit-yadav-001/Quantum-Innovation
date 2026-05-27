@@ -27,24 +27,24 @@ export const Departments: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
 
-  // Modal / Drawer states
+
   const [manageModalOpen, setManageModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedDept, setSelectedDept] = useState<Department | null>(null);
 
-  // Create form states
+
   const [newName, setNewName] = useState('');
   const [newBudget, setNewBudget] = useState('');
   const [newDesc, setNewDesc] = useState('');
 
-  // Edit form states
+
   const [editBudget, setEditBudget] = useState('');
   const [editDesc, setEditDesc] = useState('');
   const [editManagerId, setEditManagerId] = useState('');
 
   const isAdminOrHR = user?.role === 'ADMIN' || user?.role === 'HR_MANAGER';
 
-  // 1. Fetch Departments
+
   const { data: departments = [], isLoading: deptsLoading, isError: deptsError, refetch: refetchDepts } = useQuery<Department[]>({
     queryKey: ['departments'],
     queryFn: async () => {
@@ -54,7 +54,7 @@ export const Departments: React.FC = () => {
     }
   });
 
-  // 2. Fetch Candidates for Department Head (all active employees)
+
   const { data: employeesRes } = useQuery({
     queryKey: ['employees-all-candidates'],
     queryFn: async () => {
@@ -67,7 +67,7 @@ export const Departments: React.FC = () => {
 
   const candidatesList = useMemo(() => employeesRes?.data || [], [employeesRes]);
 
-  // 3. Create Department Mutation
+
   const createDeptMutation = useMutation({
     mutationFn: async (payload: Partial<Department>) => {
       await apiClient.post(ENDPOINTS.DEPARTMENTS, payload);
@@ -93,14 +93,14 @@ export const Departments: React.FC = () => {
     }
   });
 
-  // 4. Update Department Mutation (budget, manager, description)
+
   const updateDeptMutation = useMutation({
     mutationFn: async ({ id, payload }: { id: string; payload: Partial<Department> }) => {
       await apiClient.put(`${ENDPOINTS.DEPARTMENTS}/${id}`, payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['departments'] });
-      // We also invalidate employees because employee designations/details might be linked or fetched
+
       queryClient.invalidateQueries({ queryKey: ['employees'] });
       setManageModalOpen(false);
       setSelectedDept(null);
@@ -176,7 +176,6 @@ export const Departments: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
         <div>
           <h1 className="text-2xl font-bold font-display tracking-tight text-slate-800 dark:text-slate-100">
@@ -198,7 +197,6 @@ export const Departments: React.FC = () => {
         )}
       </div>
 
-      {/* Grid of Departments */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {departments.map((dept) => {
           return (
@@ -207,7 +205,6 @@ export const Departments: React.FC = () => {
               className="glassmorphism p-6 rounded-xl flex flex-col justify-between text-left hover:border-violet-500/30 transition-all shadow-sm group"
             >
               <div className="space-y-4">
-                {/* Header info */}
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-violet-50 dark:bg-violet-950/20 text-violet-600 flex items-center justify-center">
@@ -227,16 +224,13 @@ export const Departments: React.FC = () => {
                   </Badge>
                 </div>
 
-                {/* Description */}
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed min-h-12 line-clamp-3">
                   {dept.description || 'No division description available at this time.'}
                 </p>
 
                 <hr className="border-slate-100 dark:border-slate-850" />
 
-                {/* Info Fields */}
                 <div className="space-y-2.5 text-xs">
-                  {/* Budget Allocation */}
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-1.5 text-slate-400">
                       <DollarSign className="w-4.5 h-4.5" />
@@ -247,7 +241,6 @@ export const Departments: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Department Manager */}
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-1.5 text-slate-400">
                       <UserCheck className="w-4.5 h-4.5" />
@@ -267,7 +260,6 @@ export const Departments: React.FC = () => {
                 </div>
               </div>
 
-              {/* Action Button */}
               {isAdminOrHR && (
                 <div className="pt-5 mt-4 border-t border-slate-100 dark:border-slate-850">
                   <Button
@@ -286,7 +278,6 @@ export const Departments: React.FC = () => {
         })}
       </div>
 
-      {/* --- CREATE DEPARTMENT MODAL --- */}
       <Modal
         isOpen={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
@@ -340,7 +331,6 @@ export const Departments: React.FC = () => {
         </form>
       </Modal>
 
-      {/* --- EDIT / MANAGE DEPARTMENT MODAL --- */}
       <Modal
         isOpen={manageModalOpen}
         onClose={() => setManageModalOpen(false)}
@@ -360,9 +350,9 @@ export const Departments: React.FC = () => {
             options={[
               { value: 'none', label: 'Unassigned / Vacant' },
               ...candidatesList
-                .filter((c: Employee) => c.department === selectedDept?.name) // ideally same department
+                .filter((c: Employee) => c.department === selectedDept?.name)
                 .map((c: Employee) => ({ value: c.id, label: `${c.name} (${c.designation})` })),
-              // fallback to show other candidates as well in a separate section if needed
+
               ...candidatesList
                 .filter((c: Employee) => c.department !== selectedDept?.name)
                 .map((c: Employee) => ({ value: c.id, label: `${c.name} (Other - ${c.department})` }))

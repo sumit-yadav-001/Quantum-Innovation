@@ -37,7 +37,7 @@ import { Loader } from '../components/ui/Loader';
 import { ErrorState } from '../components/ui/ErrorState';
 import type { Employee } from '../types';
 
-// Zod Schema for Employee Add/Edit
+
 const employeeSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid corporate email'),
@@ -55,18 +55,18 @@ export const Employees: React.FC = () => {
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
 
-  // Search & Filter State
+
   const [search, setSearch] = useState('');
   const [department, setDepartment] = useState('');
   const [status, setStatus] = useState('');
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   
-  // Drawer States
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
 
-  // Fetch Employees via TanStack Query
+
   const { data: employeesRes, isLoading, isError, refetch } = useQuery({
     queryKey: ['employees', { search, department, status, page, limit }],
     queryFn: async () => {
@@ -88,7 +88,7 @@ export const Employees: React.FC = () => {
   const employeeData = useMemo(() => employeesRes?.data || [], [employeesRes]);
   const pagination = employeesRes?.pagination || { page: 1, limit: 10, totalCount: 0, totalPages: 1 };
 
-  // Form Setup
+
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeSchema) as Resolver<EmployeeFormValues>,
     defaultValues: {
@@ -103,7 +103,7 @@ export const Employees: React.FC = () => {
     }
   });
 
-  // Mutate: Add Employee
+
   const addMutation = useMutation({
     mutationFn: (values: EmployeeFormValues) => apiClient.post(ENDPOINTS.EMPLOYEES, values),
     onSuccess: () => {
@@ -130,7 +130,7 @@ export const Employees: React.FC = () => {
     }
   });
 
-  // Mutate: Edit Employee
+
   const editMutation = useMutation({
     mutationFn: ({ id, values }: { id: string; values: EmployeeFormValues }) => 
       apiClient.put(`${ENDPOINTS.EMPLOYEES}/${id}`, values),
@@ -159,7 +159,7 @@ export const Employees: React.FC = () => {
     }
   });
 
-  // Mutate: Delete Employee
+
   const deleteMutation = useMutation({
     mutationFn: (id: string) => apiClient.delete(`${ENDPOINTS.EMPLOYEES}/${id}`),
     onSuccess: () => {
@@ -184,7 +184,7 @@ export const Employees: React.FC = () => {
     }
   });
 
-  // Submit Handler
+
   const onSubmit = (values: EmployeeFormValues) => {
     if (editingEmployee) {
       editMutation.mutate({ id: editingEmployee.id, values });
@@ -221,7 +221,7 @@ export const Employees: React.FC = () => {
     setDrawerOpen(true);
   };
 
-  // CSV Bulk Import
+
   const handleCSVImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -238,7 +238,7 @@ export const Employees: React.FC = () => {
 
         for (const row of rows) {
           try {
-            // Basic Zod check or structural fit
+
             const validated = employeeSchema.parse({
               name: row.Name || row.name,
               email: row.Email || row.email,
@@ -270,14 +270,14 @@ export const Employees: React.FC = () => {
       }
     });
 
-    e.target.value = ''; // Reset input
+    e.target.value = '';
   };
 
-  // XLSX Export Roster
+
   const handleXLSXExport = async () => {
     try {
       dispatch(addToast({ title: 'Exporting...', message: 'Generating Excel Spreadsheet...', type: 'info' }));
-      // Fetch full active list for export (omit pagination params)
+
       const res = await apiClient.get(ENDPOINTS.EMPLOYEES, { params: { limit: 1000 } });
       const fullList = res.data.data;
 
@@ -299,7 +299,7 @@ export const Employees: React.FC = () => {
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Active Employees');
       
-      // Auto width fit
+
       const maxLens = Object.keys(formatted[0] || {}).map(k => k.length);
       formatted.forEach((row: any) => {
         Object.values(row).forEach((val: any, i) => {
@@ -316,7 +316,7 @@ export const Employees: React.FC = () => {
     }
   };
 
-  // Column definitions for TanStack Table
+
   const columns = useMemo<ColumnDef<Employee>[]>(() => [
     {
       accessorKey: 'name',
@@ -450,7 +450,6 @@ export const Employees: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Directory Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="text-left">
           <h1 className="text-2xl font-bold font-display tracking-tight text-slate-800 dark:text-slate-100">
@@ -461,9 +460,7 @@ export const Employees: React.FC = () => {
           </p>
         </div>
 
-        {/* Action Panel */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* CSV File Input */}
           <div className="relative">
             <input
               type="file"
@@ -500,7 +497,6 @@ export const Employees: React.FC = () => {
         </div>
       </div>
 
-      {/* Filters card */}
       <div className="glassmorphism p-4 rounded-xl flex flex-col md:flex-row gap-4 items-end">
         <div className="w-full md:w-1/3">
           <div className="relative">
@@ -565,7 +561,6 @@ export const Employees: React.FC = () => {
         </Button>
       </div>
 
-      {/* Database Roster Table */}
       {isLoading ? (
         <Loader message="Fetching roster records..." />
       ) : isError ? (
@@ -603,7 +598,6 @@ export const Employees: React.FC = () => {
             </table>
           </div>
 
-          {/* Table Pagination */}
           <div className="px-6 py-4 border-t border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between">
             <span className="text-xs text-slate-500">
               Showing {(page - 1) * limit + 1} to {Math.min(page * limit, pagination.totalCount)} of {pagination.totalCount} employees
@@ -634,7 +628,6 @@ export const Employees: React.FC = () => {
         </div>
       )}
 
-      {/* --- ADD/EDIT DRAWER --- */}
       <Drawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}

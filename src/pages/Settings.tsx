@@ -28,10 +28,10 @@ export const Settings: React.FC = () => {
   const { user, token } = useAppSelector((state) => state.auth);
   const { theme } = useAppSelector((state) => state.ui);
 
-  // Tabs
+
   const [activeTab, setActiveTab] = useState<'profile' | 'preferences' | 'system'>('profile');
 
-  // Form States - Profile
+
   const [profileName, setProfileName] = useState(user?.name || '');
   const [profileEmail, setProfileEmail] = useState(user?.email || '');
   const [profilePhone, setProfilePhone] = useState('+1 (555) 019-9000');
@@ -40,7 +40,7 @@ export const Settings: React.FC = () => {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Sync form with user state changes (e.g. after login)
+
   useEffect(() => {
     if (user) {
       setProfileName(user.name || '');
@@ -50,18 +50,18 @@ export const Settings: React.FC = () => {
     }
   }, [user?.id]);
 
-  // Handle local file selection → convert to base64 data URL
+
   const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
+
     if (!file.type.startsWith('image/')) {
       dispatch(addToast({ title: 'Invalid File', message: 'Please select an image file (JPG, PNG, WebP).', type: 'error' }));
       return;
     }
 
-    // Validate file size — max 2MB
+
     if (file.size > 2 * 1024 * 1024) {
       dispatch(addToast({ title: 'File Too Large', message: 'Image must be under 2MB.', type: 'error' }));
       return;
@@ -82,7 +82,7 @@ export const Settings: React.FC = () => {
     };
     reader.readAsDataURL(file);
 
-    // Reset input so same file can be re-selected
+
     e.target.value = '';
   };
 
@@ -91,13 +91,13 @@ export const Settings: React.FC = () => {
     setAvatarError(false);
   };
 
-  // Form States - Preferences
+
   const [prefEmailNotifs, setPrefEmailNotifs] = useState(true);
   const [prefWeeklyDigest, setPrefWeeklyDigest] = useState(false);
   const [prefPunchReminders, setPrefPunchReminders] = useState(true);
   const [prefCompactDensity, setPrefCompactDensity] = useState(false);
 
-  // Load preferences from localStorage if exists
+
   useEffect(() => {
     const savedPrefs = localStorage.getItem('hrms_user_preferences');
     if (savedPrefs) {
@@ -108,12 +108,12 @@ export const Settings: React.FC = () => {
         setPrefPunchReminders(parsed.punchReminders ?? true);
         setPrefCompactDensity(parsed.compactDensity ?? false);
       } catch (e) {
-        // use default values
+
       }
     }
   }, []);
 
-  // Fetch the current user employee phone details (since it's not in the main user session token)
+
   useEffect(() => {
     if (user?.id) {
       apiClient.get(`${ENDPOINTS.EMPLOYEES}/${user.id}`)
@@ -123,19 +123,19 @@ export const Settings: React.FC = () => {
           }
         })
         .catch(() => {
-          // ignore or keep default
+
         });
     }
   }, [user]);
 
-  // Update Profile Mutation
+
   const updateProfileMutation = useMutation({
     mutationFn: async (payload: { name: string; email: string; phone: string; avatar: string }) => {
       const res = await apiClient.put(`${ENDPOINTS.EMPLOYEES}/${user?.id}`, payload);
       return res.data;
     },
     onSuccess: (updatedEmp) => {
-      // Sync auth store with updated profile
+
       if (user && token) {
         const updatedUserObj = {
           ...user,
@@ -195,14 +195,13 @@ export const Settings: React.FC = () => {
   const handleResetDatabase = () => {
     if (confirm('WARNING: This will erase all modifications (new employees, leave requests, logs) and restore the mock database seed. Proceed?')) {
       resetDB();
-      // Reload page to re-initialize
+
       window.location.reload();
     }
   };
 
   return (
     <div className="space-y-6 text-left">
-      {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold font-display tracking-tight text-slate-800 dark:text-slate-100">
           Account Settings
@@ -212,7 +211,6 @@ export const Settings: React.FC = () => {
         </p>
       </div>
 
-      {/* Tabs list */}
       <div className="border-b border-slate-200 dark:border-slate-800 flex gap-4 overflow-x-auto">
         <button
           onClick={() => setActiveTab('profile')}
@@ -257,12 +255,9 @@ export const Settings: React.FC = () => {
         </button>
       </div>
 
-      {/* Tab Panels */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        {/* Main Tab Content */}
         <div className="lg:col-span-2 space-y-6">
           
-          {/* PROFILE PANEL */}
           {activeTab === 'profile' && (
             <div className="glassmorphism p-6 rounded-xl space-y-6">
               <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">
@@ -270,9 +265,7 @@ export const Settings: React.FC = () => {
               </h2>
               
               <form onSubmit={handleProfileSubmit} className="space-y-4">
-                {/* Avatar Upload Section */}
                 <div className="flex flex-col sm:flex-row gap-6 items-center border-b border-slate-100 dark:border-slate-800 pb-6">
-                  {/* Hidden file input */}
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -281,9 +274,7 @@ export const Settings: React.FC = () => {
                     className="hidden"
                   />
 
-                  {/* Clickable Avatar */}
                   <div className="relative group shrink-0 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                    {/* Avatar image or initials fallback */}
                     {profileAvatar && !avatarError ? (
                       <img
                         src={profileAvatar}
@@ -300,7 +291,6 @@ export const Settings: React.FC = () => {
                       </div>
                     )}
 
-                    {/* Hover overlay */}
                     <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1">
                       {avatarUploading ? (
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -312,11 +302,9 @@ export const Settings: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Online dot */}
                     <span className="absolute bottom-1 right-1 w-4 h-4 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full" />
                   </div>
 
-                  {/* Info + actions */}
                   <div className="flex flex-col gap-2 text-center sm:text-left">
                     <div>
                       <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{profileName || user?.name}</p>
@@ -410,7 +398,6 @@ export const Settings: React.FC = () => {
             </div>
           )}
 
-          {/* PREFERENCES PANEL */}
           {activeTab === 'preferences' && (
             <div className="glassmorphism p-6 rounded-xl space-y-6">
               <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">
@@ -418,7 +405,6 @@ export const Settings: React.FC = () => {
               </h2>
               
               <div className="space-y-4">
-                {/* Preference switches */}
                 <div className="flex items-center justify-between p-3.5 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg transition-colors">
                   <div className="space-y-0.5">
                     <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">Email System Alerts</span>
@@ -484,7 +470,6 @@ export const Settings: React.FC = () => {
             </div>
           )}
 
-          {/* SYSTEM CONSOLE */}
           {activeTab === 'system' && (
             <div className="glassmorphism p-6 rounded-xl space-y-6">
               <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">
@@ -527,7 +512,6 @@ export const Settings: React.FC = () => {
 
         </div>
 
-        {/* Sidebar Info Card */}
         <div className="glassmorphism p-5 rounded-xl space-y-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-violet-50 dark:bg-violet-950/20 text-violet-600 flex items-center justify-center shrink-0">
@@ -545,7 +529,6 @@ export const Settings: React.FC = () => {
 
           <hr className="border-slate-100 dark:border-slate-850" />
 
-          {/* Theme button */}
           <div className="flex gap-2">
             <button
               onClick={() => dispatch(setTheme('light'))}
