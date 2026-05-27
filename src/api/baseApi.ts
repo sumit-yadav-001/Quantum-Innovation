@@ -1,7 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
-// RTK Query base — all API slices extend this via injectEndpoints.
-// Using fetchBaseQuery with a token getter keeps auth in one place.
+
 export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
@@ -12,7 +11,8 @@ export const baseApi = createApi({
       return headers
     },
   }),
-  // Tag types used across all injected endpoint slices
+
+  
   tagTypes: [
     'Employee',
     'Attendance',
