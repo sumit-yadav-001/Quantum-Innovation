@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { store } from '../store';
 import { initTheme } from '../store/uiSlice';
 
-// Apply theme immediately before first render to prevent flash of wrong theme
+
 (function applyThemeEarly() {
   const saved = localStorage.getItem('hrms_theme');
   const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
@@ -18,13 +18,12 @@ import { initTheme } from '../store/uiSlice';
   }
 })();
 
-// TanStack Query client — production-grade config
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
       retry: 1,
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000, 
     },
   },
 });
@@ -35,7 +34,8 @@ interface AppProvidersProps {
 
 export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   useEffect(() => {
-    // Sync Redux state with DOM on mount
+  
+
     store.dispatch(initTheme());
   }, []);
 

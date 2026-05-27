@@ -10,7 +10,7 @@ export const RequireAuth: React.FC<RequireAuthProps> = ({ children }) => {
   const { isAuthenticated, loading } = useAppSelector((s) => s.auth)
   const location = useLocation()
 
-  // Still rehydrating from localStorage — show a spinner instead of flashing /login
+
   if (loading) {
     return (
       <div className="h-screen w-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
@@ -23,7 +23,7 @@ export const RequireAuth: React.FC<RequireAuthProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    // Save where the user was trying to go so we can redirect back after login
+  
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 

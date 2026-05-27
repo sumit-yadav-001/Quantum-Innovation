@@ -19,8 +19,7 @@ const router = createBrowserRouter([
     element: <Login />,
   },
   {
-    // Everything under "/" is behind auth. MainLayout renders the shell
-    // (sidebar + header) and <Outlet /> drops in the active page.
+   
     path: '/',
     element: (
       <RequireAuth>
