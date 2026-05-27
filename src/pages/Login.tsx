@@ -1,9 +1,7 @@
+import { useMutation } from '@tanstack/react-query';
+import { zodResolver } from '@hookform/resolvers/zod';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
 import {
   Sparkles,
   Key,
@@ -15,10 +13,12 @@ import {
   Wallet,
   ArrowRight
 } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { z } from 'zod';
 import apiClient from '../api/axios';
 import { ENDPOINTS } from '../api/endpoints';
 import { useAppDispatch, useAppSelector } from '../app/store';
-import { loginStart, loginSuccess, loginFailure } from '../app/store/authSlice';
+import { loginFailure, loginStart, loginSuccess } from '../app/store/authSlice';
 import { addToast } from '../app/store/notificationSlice';
 
 const loginSchema = z.object({
@@ -28,11 +28,18 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
+type DemoRole = 'ADMIN' | 'HR' | 'LEAD' | 'EMPLOYEE';
+type MockUser = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  department: string;
+  designation: string;
+  avatar: string;
+};
 
-const MOCK_CREDENTIALS: Record<string, {
-  password: string;
-  user: { id: string; name: string; email: string; role: string; department: string; designation: string; avatar: string }
-}> = {
+const MOCK_CREDENTIALS: Record<string, { password: string; user: MockUser }> = {
   'admin@hrms.com': {
     password: 'admin123',
     user: { id: 'emp-admin', name: 'Admin User', email: 'admin@hrms.com', role: 'ADMIN', department: 'Executive', designation: 'CEO', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=200' }
@@ -66,13 +73,25 @@ const FEATURES = [
   { icon: <Wallet className="w-4 h-4" />, label: 'Payroll Processing', desc: 'Salary disbursements & payslips' },
 ];
 
+const DEMO_CREDENTIALS: Record<DemoRole, { email: string; pass: string }> = {
+  ADMIN: { email: 'admin@hrms.com', pass: 'admin123' },
+  HR: { email: 'hr@hrms.com', pass: 'hr123' },
+  LEAD: { email: 'lead@hrms.com', pass: 'lead123' },
+  EMPLOYEE: { email: 'employee@hrms.com', pass: 'employee123' }
+};
+
 export const Login: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const { loading, error } = useAppSelector((state) => state.auth);
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<LoginFormValues>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors }
+  } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' }
   });
@@ -94,11 +113,13 @@ export const Login: React.FC = () => {
     },
     onSuccess: (data) => {
       dispatch(loginSuccess(data));
-      dispatch(addToast({
-        title: 'Welcome Back!',
-        message: `Logged in as ${data.user.name} (${data.user.role.replace('_', ' ')}).`,
-        type: 'success'
-      }));
+      dispatch(
+        addToast({
+          title: 'Welcome Back!',
+          message: `Logged in as ${data.user.name} (${data.user.role.replace('_', ' ')}).`,
+          type: 'success'
+        })
+      );
       navigate(from, { replace: true });
     },
     onError: (err: any) => {
@@ -110,15 +131,10 @@ export const Login: React.FC = () => {
 
   const onSubmit = (values: LoginFormValues) => loginMutation.mutate(values);
 
-  const fillCredentials = (role: 'ADMIN' | 'HR' | 'LEAD' | 'EMPLOYEE') => {
-    const creds = {
-      ADMIN:    { email: 'admin@hrms.com',    pass: 'admin123' },
-      HR:       { email: 'hr@hrms.com',       pass: 'hr123' },
-      LEAD:     { email: 'lead@hrms.com',     pass: 'lead123' },
-      EMPLOYEE: { email: 'employee@hrms.com', pass: 'employee123' }
-    };
-    setValue('email', creds[role].email);
-    setValue('password', creds[role].pass);
+  const fillCredentials = (role: DemoRole) => {
+    const creds = DEMO_CREDENTIALS[role];
+    setValue('email', creds.email);
+    setValue('password', creds.pass);
   };
 
   return (

@@ -1,42 +1,34 @@
-import React, { useState, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
-  Network, 
-  Plus, 
-  Users, 
-  DollarSign, 
-  UserCheck, 
-  FolderEdit, 
-  AlertCircle
-} from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AlertCircle, DollarSign, FolderEdit, Network, Plus, UserCheck, Users } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
 import apiClient from '../api/axios';
 import { ENDPOINTS } from '../api/endpoints';
-import { useAppSelector, useAppDispatch } from '../app/store';
+import { useAppDispatch, useAppSelector } from '../app/store';
 import { addToast } from '../app/store/notificationSlice';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { Select } from '../components/ui/Select';
 import { Badge } from '../components/ui/Badge';
-import { Loader } from '../components/ui/Loader';
+import { Button } from '../components/ui/Button';
 import { ErrorState } from '../components/ui/ErrorState';
+import { Input } from '../components/ui/Input';
+import { Loader } from '../components/ui/Loader';
 import { Modal } from '../components/ui/Modal';
+import { Select } from '../components/ui/Select';
 import type { Department, Employee } from '../types';
+
+const DEFAULT_BUDGET = 100000;
+const EMPLOYEE_CANDIDATE_LIMIT = 100;
 
 export const Departments: React.FC = () => {
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
 
-
   const [manageModalOpen, setManageModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedDept, setSelectedDept] = useState<Department | null>(null);
 
-
   const [newName, setNewName] = useState('');
   const [newBudget, setNewBudget] = useState('');
   const [newDesc, setNewDesc] = useState('');
-
 
   const [editBudget, setEditBudget] = useState('');
   const [editDesc, setEditDesc] = useState('');
@@ -59,7 +51,7 @@ export const Departments: React.FC = () => {
     queryKey: ['employees-all-candidates'],
     queryFn: async () => {
       const res = await apiClient.get(ENDPOINTS.EMPLOYEES, {
-        params: { limit: 100, status: 'ACTIVE' }
+        params: { limit: EMPLOYEE_CANDIDATE_LIMIT, status: 'ACTIVE' }
       });
       return res.data;
     }
@@ -135,7 +127,7 @@ export const Departments: React.FC = () => {
     }
     createDeptMutation.mutate({
       name: newName,
-      budget: Number(newBudget) || 100000,
+      budget: Number(newBudget) || DEFAULT_BUDGET,
       description: newDesc
     });
   };

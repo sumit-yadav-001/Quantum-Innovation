@@ -1,5 +1,4 @@
-// All API paths in one place — update here if the backend routes ever change.
-// MSW intercepts these same paths in mocks/handlers.ts.
+
 
 export const ENDPOINTS = {
   LOGIN: '/api/auth/login',

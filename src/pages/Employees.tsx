@@ -1,42 +1,37 @@
-import React, { useState, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Edit2,
+  Eye,
+  Search,
+  Trash2,
+  Upload,
+  UserPlus
+} from 'lucide-react';
+import Papa from 'papaparse';
+import React, { useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import type { Resolver, SubmitHandler } from 'react-hook-form';
 import { Link } from 'react-router-dom';
-import { 
-  Search, 
-  Download, 
-  Upload, 
-  Edit2, 
-  Trash2, 
-  ChevronLeft, 
-  ChevronRight, 
-  Eye,
-  UserPlus
-} from 'lucide-react';
-import { 
-  useReactTable, 
-  getCoreRowModel, 
-  flexRender 
-} from '@tanstack/react-table';
-import type { ColumnDef } from '@tanstack/react-table';
 import * as XLSX from 'xlsx';
-import Papa from 'papaparse';
 import apiClient from '../api/axios';
 import { ENDPOINTS } from '../api/endpoints';
 import { useAppDispatch } from '../app/store';
 import { addToast } from '../app/store/notificationSlice';
+import { Drawer } from '../components/ui/Drawer';
+import { ErrorState } from '../components/ui/ErrorState';
+import { Loader } from '../components/ui/Loader';
+import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
-import { Badge } from '../components/ui/Badge';
-import { Drawer } from '../components/ui/Drawer';
-import { Loader } from '../components/ui/Loader';
-import { ErrorState } from '../components/ui/ErrorState';
 import type { Employee } from '../types';
-
 
 const employeeSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -51,21 +46,51 @@ const employeeSchema = z.object({
 
 type EmployeeFormValues = z.infer<typeof employeeSchema>;
 
+const DEPARTMENT_FILTER_OPTIONS = [
+  { value: 'All', label: 'All Departments' },
+  { value: 'Executive', label: 'Executive' },
+  { value: 'Human Resources', label: 'Human Resources' },
+  { value: 'Engineering', label: 'Engineering' },
+  { value: 'Marketing', label: 'Marketing' },
+  { value: 'Finance', label: 'Finance' },
+  { value: 'Sales', label: 'Sales' }
+];
+
+const DEPARTMENT_FORM_OPTIONS = [
+  { value: 'Human Resources', label: 'Human Resources' },
+  { value: 'Engineering', label: 'Engineering' },
+  { value: 'Marketing', label: 'Marketing' },
+  { value: 'Finance', label: 'Finance' },
+  { value: 'Sales', label: 'Sales' }
+];
+
+const STATUS_FILTER_OPTIONS = [
+  { value: '', label: 'All Statuses' },
+  { value: 'ACTIVE', label: 'Active Only' },
+  { value: 'INACTIVE', label: 'Inactive Only' }
+];
+
+const STATUS_FORM_OPTIONS = [
+  { value: 'ACTIVE', label: 'Active Employee' },
+  { value: 'INACTIVE', label: 'Inactive / On Notice' }
+];
+
+function todayISODate() {
+  return new Date().toISOString().split('T')[0];
+}
+
 export const Employees: React.FC = () => {
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
-
 
   const [search, setSearch] = useState('');
   const [department, setDepartment] = useState('');
   const [status, setStatus] = useState('');
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
-  
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
-
 
   const { data: employeesRes, isLoading, isError, refetch } = useQuery({
     queryKey: ['employees', { search, department, status, page, limit }],
@@ -88,8 +113,13 @@ export const Employees: React.FC = () => {
   const employeeData = useMemo(() => employeesRes?.data || [], [employeesRes]);
   const pagination = employeesRes?.pagination || { page: 1, limit: 10, totalCount: 0, totalPages: 1 };
 
-
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<EmployeeFormValues>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors }
+  } = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeSchema) as Resolver<EmployeeFormValues>,
     defaultValues: {
       name: '',
@@ -98,11 +128,10 @@ export const Employees: React.FC = () => {
       department: '',
       designation: '',
       salary: 60000,
-      joiningDate: new Date().toISOString().split('T')[0],
+      joiningDate: todayISODate(),
       status: 'ACTIVE'
     }
   });
-
 
   const addMutation = useMutation({
     mutationFn: (values: EmployeeFormValues) => apiClient.post(ENDPOINTS.EMPLOYEES, values),
@@ -130,9 +159,8 @@ export const Employees: React.FC = () => {
     }
   });
 
-
   const editMutation = useMutation({
-    mutationFn: ({ id, values }: { id: string; values: EmployeeFormValues }) => 
+    mutationFn: ({ id, values }: { id: string; values: EmployeeFormValues }) =>
       apiClient.put(`${ENDPOINTS.EMPLOYEES}/${id}`, values),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employees'] });
@@ -159,7 +187,6 @@ export const Employees: React.FC = () => {
     }
   });
 
-
   const deleteMutation = useMutation({
     mutationFn: (id: string) => apiClient.delete(`${ENDPOINTS.EMPLOYEES}/${id}`),
     onSuccess: () => {
@@ -184,7 +211,6 @@ export const Employees: React.FC = () => {
     }
   });
 
-
   const onSubmit = (values: EmployeeFormValues) => {
     if (editingEmployee) {
       editMutation.mutate({ id: editingEmployee.id, values });
@@ -202,7 +228,7 @@ export const Employees: React.FC = () => {
       department: '',
       designation: '',
       salary: 60000,
-      joiningDate: new Date().toISOString().split('T')[0],
+      joiningDate: todayISODate(),
       status: 'ACTIVE'
     });
     setDrawerOpen(true);
@@ -246,7 +272,7 @@ export const Employees: React.FC = () => {
               department: row.Department || row.department,
               designation: row.Designation || row.designation,
               salary: Number(row.Salary || row.salary) || 50000,
-              joiningDate: row.JoiningDate || row.joiningDate || new Date().toISOString().split('T')[0],
+              joiningDate: row.JoiningDate || row.joiningDate || todayISODate(),
               status: (row.Status || row.status || 'ACTIVE').toUpperCase() as any
             });
 
@@ -298,7 +324,6 @@ export const Employees: React.FC = () => {
       const worksheet = XLSX.utils.json_to_sheet(formatted);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Active Employees');
-      
 
       const maxLens = Object.keys(formatted[0] || {}).map(k => k.length);
       formatted.forEach((row: any) => {
@@ -309,7 +334,7 @@ export const Employees: React.FC = () => {
       worksheet['!cols'] = maxLens.map(len => ({ wch: len + 3 }));
 
       XLSX.writeFile(workbook, `AuraHR_Employee_Roster_${new Date().toISOString().split('T')[0]}.xlsx`);
-      
+
       dispatch(addToast({ title: 'Export Successful', message: 'Employee roster downloaded as XLSX.', type: 'success' }));
     } catch (err) {
       dispatch(addToast({ title: 'Export Failed', message: 'Unable to build spreadsheet file.', type: 'error' }));
@@ -515,15 +540,7 @@ export const Employees: React.FC = () => {
 
         <div className="w-full md:w-1/4">
           <Select
-            options={[
-              { value: 'All', label: 'All Departments' },
-              { value: 'Executive', label: 'Executive' },
-              { value: 'Human Resources', label: 'Human Resources' },
-              { value: 'Engineering', label: 'Engineering' },
-              { value: 'Marketing', label: 'Marketing' },
-              { value: 'Finance', label: 'Finance' },
-              { value: 'Sales', label: 'Sales' }
-            ]}
+            options={DEPARTMENT_FILTER_OPTIONS}
             value={department}
             onChange={(e) => {
               setDepartment(e.target.value);
@@ -534,11 +551,7 @@ export const Employees: React.FC = () => {
 
         <div className="w-full md:w-1/4">
           <Select
-            options={[
-              { value: '', label: 'All Statuses' },
-              { value: 'ACTIVE', label: 'Active Only' },
-              { value: 'INACTIVE', label: 'Inactive Only' }
-            ]}
+            options={STATUS_FILTER_OPTIONS}
             value={status}
             onChange={(e) => {
               setStatus(e.target.value);
@@ -658,13 +671,7 @@ export const Employees: React.FC = () => {
 
           <Select
             label="Department"
-            options={[
-              { value: 'Human Resources', label: 'Human Resources' },
-              { value: 'Engineering', label: 'Engineering' },
-              { value: 'Marketing', label: 'Marketing' },
-              { value: 'Finance', label: 'Finance' },
-              { value: 'Sales', label: 'Sales' }
-            ]}
+            options={DEPARTMENT_FORM_OPTIONS}
             error={errors.department?.message}
             placeholder="Select Department"
             {...register('department')}
@@ -694,10 +701,7 @@ export const Employees: React.FC = () => {
 
           <Select
             label="Account Status"
-            options={[
-              { value: 'ACTIVE', label: 'Active Employee' },
-              { value: 'INACTIVE', label: 'Inactive / On Notice' }
-            ]}
+            options={STATUS_FORM_OPTIONS}
             error={errors.status?.message}
             {...register('status')}
           />

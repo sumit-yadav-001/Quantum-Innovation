@@ -1,36 +1,35 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { CalendarDays, Check, Plus, X } from 'lucide-react';
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
-  CalendarDays, 
-  Plus, 
-  Check, 
-  X
-} from 'lucide-react';
 import apiClient from '../api/axios';
 import { ENDPOINTS } from '../api/endpoints';
-import { useAppSelector, useAppDispatch } from '../app/store';
+import { useAppDispatch, useAppSelector } from '../app/store';
 import { addToast } from '../app/store/notificationSlice';
+import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { Select } from '../components/ui/Select';
-import { Badge } from '../components/ui/Badge';
 import { Loader } from '../components/ui/Loader';
 import { Modal } from '../components/ui/Modal';
+import { Select } from '../components/ui/Select';
 import { safeArray } from '../utils/helpers';
 import type { LeaveRequest, LeaveBalance } from '../types';
+
+const LEAVE_TYPE_OPTIONS = [
+  { value: 'CASUAL', label: 'Casual Leave' },
+  { value: 'SICK', label: 'Sick Leave' },
+  { value: 'ANNUAL', label: 'Annual Paid Leave' }
+] as const;
 
 export const Leaves: React.FC = () => {
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
 
-
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<LeaveRequest | null>(null);
   const [rejectReasonModalOpen, setRejectReasonModalOpen] = useState(false);
   const [rejectionReasonText, setRejectionReasonText] = useState('');
   const [activeQueueTab, setActiveQueueTab] = useState<'my' | 'approvals'>('my');
-
 
   const [leaveType, setLeaveType] = useState<'SICK' | 'CASUAL' | 'ANNUAL'>('CASUAL');
   const [startDate, setStartDate] = useState('');
@@ -136,7 +135,7 @@ export const Leaves: React.FC = () => {
 
   const handleRejectSubmit = () => {
     if (!rejectionReasonText) {
-      alert("Please provide a reason for rejecting the leave request.");
+      alert('Please provide a reason for rejecting the leave request.');
       return;
     }
     processMutation.mutate({ 
@@ -345,11 +344,7 @@ export const Leaves: React.FC = () => {
         <div className="space-y-4">
           <Select
             label="Leave Type"
-            options={[
-              { value: 'CASUAL', label: 'Casual Leave' },
-              { value: 'SICK', label: 'Sick Leave' },
-              { value: 'ANNUAL', label: 'Annual Paid Leave' }
-            ]}
+            options={LEAVE_TYPE_OPTIONS as any}
             value={leaveType}
             onChange={(e) => setLeaveType(e.target.value as any)}
           />

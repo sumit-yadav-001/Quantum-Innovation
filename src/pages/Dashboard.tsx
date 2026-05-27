@@ -1,66 +1,74 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
-import { 
-  Users, 
-  CalendarRange, 
-  Wallet, 
-  UserCheck, 
-  ArrowRight, 
-  Clock
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  ArrowRight,
+  CalendarRange,
+  Clock,
+  UserCheck,
+  Users,
+  Wallet
 } from 'lucide-react';
-import { 
-  ResponsiveContainer, 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip as ChartTooltip, 
-  PieChart, 
-  Pie, 
-  Cell, 
-  BarChart, 
-  Bar
+import React, { useState } from 'react';
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip as ChartTooltip,
+  XAxis,
+  YAxis
 } from 'recharts';
+import { Link } from 'react-router-dom';
 import apiClient from '../api/axios';
 import { ENDPOINTS } from '../api/endpoints';
-import { useAppSelector, useAppDispatch } from '../app/store';
+import { useAppDispatch, useAppSelector } from '../app/store';
 import { addToast } from '../app/store/notificationSlice';
 import { DashboardCard } from '../components/ui/DashboardCard';
-import { Button } from '../components/ui/Button';
-import { Modal } from '../components/ui/Modal';
-import { Input } from '../components/ui/Input';
-import { Select } from '../components/ui/Select';
 import { Badge } from '../components/ui/Badge';
-import { Loader } from '../components/ui/Loader';
+import { Button } from '../components/ui/Button';
 import { ErrorState } from '../components/ui/ErrorState';
+import { Input } from '../components/ui/Input';
+import { Loader } from '../components/ui/Loader';
+import { Modal } from '../components/ui/Modal';
+import { Select } from '../components/ui/Select';
 
 const COLORS = ['#8b5cf6', '#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+const TODAY_STR = '2026-05-22';
+const LEAVE_TYPES = ['SICK', 'CASUAL', 'ANNUAL'] as const;
+
+function getNowTimeString() {
+  return new Date().toTimeString().split(' ')[0];
+}
 
 export const Dashboard: React.FC = () => {
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
-  
+
   const [leaveModalOpen, setLeaveModalOpen] = useState(false);
   const [leaveType, setLeaveType] = useState<'SICK' | 'CASUAL' | 'ANNUAL'>('CASUAL');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [reason, setReason] = useState('');
 
-  const todayStr = '2026-05-22';
-
-
-  const { data: employeesRes, isLoading: empsLoading, isError: empsError, refetch: refetchEmps } = useQuery({
+  const {
+    data: employeesRes,
+    isLoading: empsLoading,
+    isError: empsError,
+    refetch: refetchEmps
+  } = useQuery({
     queryKey: ['employees', { limit: 100 }],
     queryFn: () => apiClient.get(`${ENDPOINTS.EMPLOYEES}?limit=100`),
     retry: 2
   });
 
   const { data: attendanceRes, isLoading: attsLoading } = useQuery({
-    queryKey: ['attendance', { date: todayStr }],
-    queryFn: () => apiClient.get(`${ENDPOINTS.ATTENDANCE}?date=${todayStr}`),
+    queryKey: ['attendance', { date: TODAY_STR }],
+    queryFn: () => apiClient.get(`${ENDPOINTS.ATTENDANCE}?date=${TODAY_STR}`),
     retry: 2
   });
 
@@ -89,14 +97,12 @@ export const Dashboard: React.FC = () => {
     retry: 2
   });
 
-
   const punchMutation = useMutation({
     mutationFn: async (action: 'IN' | 'OUT') => {
-      const now = new Date();
-      const timeStr = now.toTimeString().split(' ')[0];
+      const timeStr = getNowTimeString();
       await apiClient.post(ENDPOINTS.ATTENDANCE_PUNCH, {
         employeeId: user?.id,
-        date: todayStr,
+        date: TODAY_STR,
         time: timeStr,
         action
       });
@@ -122,7 +128,6 @@ export const Dashboard: React.FC = () => {
       );
     }
   });
-
 
   const leaveMutation = useMutation({
     mutationFn: async () => {
@@ -168,25 +173,21 @@ export const Dashboard: React.FC = () => {
     return <ErrorState message="Could not compile dashboard widgets." onRetry={() => refetchEmps()} />;
   }
 
-
   const employees = employeesRes?.data?.data || [];
-  const headcount = employees.filter((e: any) => e.status === 'ACTIVE').length;
-  
   const todayAttendance = attendanceRes?.data || [];
-  const presentToday = todayAttendance.filter((a: any) => a.status === 'PRESENT' || a.status === 'LATE').length;
-  
   const leaves = leavesRes?.data || [];
+
+  const headcount = employees.filter((e: any) => e.status === 'ACTIVE').length;
+  const presentToday = todayAttendance.filter((a: any) => a.status === 'PRESENT' || a.status === 'LATE').length;
   const pendingLeavesCount = leaves.filter((l: any) => l.status === 'PENDING').length;
-  
+
   const payrollStats = payrollStatsRes?.data || { totalOutflow: 0 };
   const monthlySalaryOutflow = payrollStats.totalOutflow;
 
-
   const myPunches = myAttendanceRes?.data || [];
-  const todayPunch = myPunches.find((a: any) => a.date === todayStr);
+  const todayPunch = myPunches.find((a: any) => a.date === TODAY_STR);
   const isPunchedIn = todayPunch && todayPunch.checkIn && !todayPunch.checkOut;
   const isPunchedOut = todayPunch && todayPunch.checkIn && todayPunch.checkOut;
-
 
   const deptDataMap: Record<string, number> = {};
   employees.forEach((emp: any) => {
@@ -202,8 +203,13 @@ export const Dashboard: React.FC = () => {
 
   const payrollTrends = generalAttStatsRes?.data?.monthlySpendTrend || [];
 
-
-  const leaveTypesMap = { SICK: 0, CASUAL: 0, ANNUAL: 0 };
+  const leaveTypesMap = LEAVE_TYPES.reduce(
+    (acc, k) => {
+      acc[k] = 0;
+      return acc;
+    },
+    {} as Record<(typeof LEAVE_TYPES)[number], number>
+  );
   leaves.forEach((l: any) => {
     if (l.status === 'APPROVED') {
       leaveTypesMap[l.type as keyof typeof leaveTypesMap] = (leaveTypesMap[l.type as keyof typeof leaveTypesMap] || 0) + 1;
@@ -235,7 +241,7 @@ export const Dashboard: React.FC = () => {
             Welcome back, {user?.name}!
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Quantum Innovations Dashboard / Corporate Overview. Today is {todayStr}
+            Quantum Innovations Dashboard / Corporate Overview. Today is {TODAY_STR}
           </p>
         </div>
 

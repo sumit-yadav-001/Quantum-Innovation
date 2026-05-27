@@ -1,26 +1,28 @@
-import React, { useState, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
-  Settings as SettingsIcon, 
-  User, 
-  Bell, 
-  Sun, 
-  Moon, 
-  ShieldAlert, 
-  Save, 
-  Database,
+import {
+  Bell,
   Camera,
-  Trash2
+  Database,
+  Moon,
+  Save,
+  Settings as SettingsIcon,
+  ShieldAlert,
+  Sun,
+  Trash2,
+  User
 } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
 import apiClient from '../api/axios';
 import { ENDPOINTS } from '../api/endpoints';
-import { useAppSelector, useAppDispatch } from '../app/store';
+import { useAppDispatch, useAppSelector } from '../app/store';
 import { setTheme } from '../app/store/uiSlice';
 import { loginSuccess } from '../app/store/authSlice';
 import { addToast } from '../app/store/notificationSlice';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { resetDB } from '../mocks/db';
+
+const PREFS_KEY = 'hrms_user_preferences';
 
 export const Settings: React.FC = () => {
   const queryClient = useQueryClient();
@@ -99,7 +101,7 @@ export const Settings: React.FC = () => {
 
 
   useEffect(() => {
-    const savedPrefs = localStorage.getItem('hrms_user_preferences');
+    const savedPrefs = localStorage.getItem(PREFS_KEY);
     if (savedPrefs) {
       try {
         const parsed = JSON.parse(savedPrefs);
@@ -184,7 +186,7 @@ export const Settings: React.FC = () => {
       punchReminders: prefPunchReminders,
       compactDensity: prefCompactDensity
     };
-    localStorage.setItem('hrms_user_preferences', JSON.stringify(preferencesObj));
+    localStorage.setItem(PREFS_KEY, JSON.stringify(preferencesObj));
     dispatch(addToast({
       title: 'Preferences Saved',
       message: 'System alerts and dashboard preferences updated.',

@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { 
-  ArrowLeft, 
-  Mail, 
-  Phone, 
-  Briefcase, 
-  Calendar, 
-  Clock,
+import {
+  ArrowLeft,
+  Briefcase,
+  Calendar,
   CalendarDays,
-  Receipt,
+  Clock,
   Download,
-  Eye
+  Eye,
+  Mail,
+  Phone,
+  Receipt
 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import apiClient from '../api/axios';
 import { ENDPOINTS } from '../api/endpoints';
-import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { Loader } from '../components/ui/Loader';
+import { Button } from '../components/ui/Button';
 import { ErrorState } from '../components/ui/ErrorState';
+import { Loader } from '../components/ui/Loader';
 import { Modal } from '../components/ui/Modal';
 import type { Employee, AttendanceRecord, LeaveRequest, PayrollRecord } from '../types';
 
@@ -88,8 +88,8 @@ export const EmployeeProfile: React.FC = () => {
     );
   }
 
-  const handleViewPayslip = (pay: PayrollRecord) => {
-    setSelectedPayslip(pay);
+  const handleViewPayslip = (record: PayrollRecord) => {
+    setSelectedPayslip(record);
     setPayslipModalOpen(true);
   };
 

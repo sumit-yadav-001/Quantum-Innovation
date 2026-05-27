@@ -1,41 +1,42 @@
-import React, { useState, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
-  FolderOpen, 
-  Upload, 
-  Trash2, 
-  Eye, 
-  FileText, 
-  FileSpreadsheet, 
-  FileCode, 
-  Search, 
-  FileArchive, 
-  Calendar, 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  Calendar,
   Database,
+  Eye,
+  FileArchive,
+  FileCode,
+  FileSpreadsheet,
+  FileText,
+  FolderOpen,
+  Search,
+  Trash2,
+  Upload,
   User
 } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
 import apiClient from '../api/axios';
 import { ENDPOINTS } from '../api/endpoints';
-import { useAppSelector, useAppDispatch } from '../app/store';
+import { useAppDispatch, useAppSelector } from '../app/store';
 import { addToast } from '../app/store/notificationSlice';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { Select } from '../components/ui/Select';
 import { Badge } from '../components/ui/Badge';
-import { Loader } from '../components/ui/Loader';
+import { Button } from '../components/ui/Button';
 import { ErrorState } from '../components/ui/ErrorState';
+import { Input } from '../components/ui/Input';
+import { Loader } from '../components/ui/Loader';
 import { Modal } from '../components/ui/Modal';
+import { Select } from '../components/ui/Select';
 import type { DocumentRecord, DocumentCategory, Employee } from '../types';
+
+const EMPLOYEE_DROPDOWN_LIMIT = 100;
+const CATEGORY_TABS = ['All', 'Policy', 'Contract', 'ID_Proof', 'Payroll'];
 
 export const Documents: React.FC = () => {
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
 
-
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  
 
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadName, setUploadName] = useState('');
@@ -65,7 +66,7 @@ export const Documents: React.FC = () => {
     queryKey: ['employees-for-docs-dropdown'],
     queryFn: async () => {
       const res = await apiClient.get(ENDPOINTS.EMPLOYEES, {
-        params: { limit: 100, status: 'ACTIVE' }
+        params: { limit: EMPLOYEE_DROPDOWN_LIMIT, status: 'ACTIVE' }
       });
       return res.data;
     },
@@ -188,8 +189,6 @@ export const Documents: React.FC = () => {
     return <FileCode className="w-8 h-8 text-slate-500 shrink-0" />;
   };
 
-  const categories = ['All', 'Policy', 'Contract', 'ID_Proof', 'Payroll'];
-
   if (docsLoading) {
     return <Loader message="Decrypting locker archives and registry..." />;
   }
@@ -227,7 +226,7 @@ export const Documents: React.FC = () => {
             Locker Divisions
           </span>
           <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-1.5 pb-2 lg:pb-0">
-            {categories.map((cat) => {
+            {CATEGORY_TABS.map((cat) => {
               const isActive = activeCategory === cat;
               return (
                 <button

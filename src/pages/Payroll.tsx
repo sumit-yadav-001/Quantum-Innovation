@@ -1,28 +1,32 @@
-import React, { useState, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
-  Receipt, 
-  Download, 
-  CreditCard, 
-  CircleAlert, 
-  Printer, 
-  Calendar, 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
   Building,
-  TrendingUp,
-  DollarSign
+  Calendar,
+  CircleAlert,
+  CreditCard,
+  DollarSign,
+  Download,
+  Printer,
+  Receipt,
+  TrendingUp
 } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import apiClient from '../api/axios';
 import { ENDPOINTS } from '../api/endpoints';
-import { useAppSelector, useAppDispatch } from '../app/store';
+import { useAppDispatch, useAppSelector } from '../app/store';
 import { addToast } from '../app/store/notificationSlice';
-import { Button } from '../components/ui/Button';
-import { Select } from '../components/ui/Select';
 import { Badge } from '../components/ui/Badge';
-import { Loader } from '../components/ui/Loader';
+import { Button } from '../components/ui/Button';
 import { ErrorState } from '../components/ui/ErrorState';
+import { Loader } from '../components/ui/Loader';
 import { Modal } from '../components/ui/Modal';
+import { Select } from '../components/ui/Select';
 import type { PayrollRecord } from '../types';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+
+function todayISODate() {
+  return new Date().toISOString().split('T')[0];
+}
 
 export const Payroll: React.FC = () => {
   const queryClient = useQueryClient();
@@ -87,7 +91,7 @@ export const Payroll: React.FC = () => {
       }));
 
       if (selectedPayroll && selectedPayroll.id === recordId) {
-        setSelectedPayroll(prev => prev ? { ...prev, status: 'PAID', paidDate: new Date().toISOString().split('T')[0] } : null);
+        setSelectedPayroll((prev) => (prev ? { ...prev, status: 'PAID', paidDate: todayISODate() } : null));
       }
     },
     onError: (err: any) => {

@@ -1,28 +1,29 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Clock, Download, Search } from 'lucide-react';
 import Papa from 'papaparse';
-import { 
-  Clock, 
-  Search, 
-  Download
-} from 'lucide-react';
+import React, { useState } from 'react';
 import apiClient from '../api/axios';
 import { ENDPOINTS } from '../api/endpoints';
-import { useAppSelector, useAppDispatch } from '../app/store';
+import { useAppDispatch, useAppSelector } from '../app/store';
 import { addToast } from '../app/store/notificationSlice';
+import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { Badge } from '../components/ui/Badge';
 import { Loader } from '../components/ui/Loader';
 import type { AttendanceRecord } from '../types';
+
+const TODAY_STR = '2026-05-22';
+
+function nowTimeString() {
+  return new Date().toTimeString().split(' ')[0];
+}
 
 export const Attendance: React.FC = () => {
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
 
-  const todayStr = '2026-05-22';
-  const [filterDate, setFilterDate] = useState(todayStr);
+  const [filterDate, setFilterDate] = useState(TODAY_STR);
   const [employeeSearch, setEmployeeSearch] = useState('');
 
   const isAdminOrHR = user?.role === 'ADMIN' || user?.role === 'HR_MANAGER' || user?.role === 'TEAM_LEAD';
@@ -63,11 +64,10 @@ export const Attendance: React.FC = () => {
 
   const punchMutation = useMutation({
     mutationFn: async (action: 'IN' | 'OUT') => {
-      const now = new Date();
-      const timeStr = now.toTimeString().split(' ')[0];
+      const timeStr = nowTimeString();
       await apiClient.post(ENDPOINTS.ATTENDANCE_PUNCH, {
         employeeId: user?.id,
-        date: todayStr,
+        date: TODAY_STR,
         time: timeStr,
         action
       });
@@ -98,8 +98,7 @@ export const Attendance: React.FC = () => {
     rec.employeeName?.toLowerCase().includes(employeeSearch.toLowerCase())
   );
 
-
-  const personalTodayRecord = safeMyAttendance.find((rec) => rec.date === todayStr);
+  const personalTodayRecord = safeMyAttendance.find((rec) => rec.date === TODAY_STR);
   const isPunchedIn = personalTodayRecord && personalTodayRecord.checkIn && !personalTodayRecord.checkOut;
   const isPunchedOut = personalTodayRecord && personalTodayRecord.checkIn && personalTodayRecord.checkOut;
 
@@ -233,7 +232,7 @@ export const Attendance: React.FC = () => {
             <Button
               variant="secondary"
               onClick={() => {
-                setFilterDate(todayStr);
+                setFilterDate(TODAY_STR);
                 setEmployeeSearch('');
               }}
               className="shrink-0"
